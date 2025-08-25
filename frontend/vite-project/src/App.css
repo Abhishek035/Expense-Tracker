@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@fortawesome/fontawesome-free/css/all.css";
+
+.menu-button {
+  @apply flex gap-2 items-center;
+}
