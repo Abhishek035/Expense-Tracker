@@ -7,12 +7,12 @@
 @theme {
   --font-inter-tight: "Inter Tight", sans-serif;
   --font-poppins: "Poppins", sans-serif;
-  --color-primary: #0097A7;
+  --color-primary: #0090A0;
   --color-secondary: #ffbf69;
   --color-accent: #ff9f1c;
   --color-background1: #ffffff;
   --color-background2: #cbf3f0;
-  --color-text: #141414;
+  --color-text: gray-900;
   /*For dark mode*/
   --color-primary-dark: #2ec4b6;
   --color-secondary-dark: #ffbf69;
