@@ -81,7 +81,7 @@ const FinStats = () => {
 
   const yAxisConfig = calculateYAxisConfig();
   return (
-    <div className="bg-white rounded-lg pt-4 pl-4 pr-4 shadow-sm border border-gray-100 h-full flex flex-col">
+    <div className="bg-white rounded-lg pt-3 pl-3 pr-4 shadow-sm border border-gray-100 h-full flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-text">Financial Statistics</h2>

@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import Cards from "./dashboard/Cards";
 import FinStats from "./dashboard/FinStats";
-import Recent from "./dashboard/Recent";
+import Recurring from "./dashboard/Recurring";
 import LastTransaction from "./dashboard/LastTransaction";
 
 const balanceData = [
@@ -196,14 +196,14 @@ const DashBoard = () => {
             </div>
           </div>
         </div>
-        <div className="sm:col-[2_/_span_1] sm:row-[1_/_span_1] border-2 rounded-xl">
+        <div className="sm:col-[2_/_span_1] sm:row-[1_/_span_1]">
           <Cards />
         </div>
         <div className="sm:col-[1_/_span_1] sm:row-[2_/_span_1] min-h-[200px]">
           <FinStats />
         </div>
-        <div className="sm:col-[1_/_span_1] sm:row-[3_/_span_1] border-2 rounded-xl">
-          <Recent />
+        <div className="sm:col-[1_/_span_1] sm:row-[3_/_span_1]">
+          <Recurring />
         </div>
         <div className="sm:col-[2_/_span_1] sm:row-[2_/_span_2] border-2 rounded-xl">
           <LastTransaction />
