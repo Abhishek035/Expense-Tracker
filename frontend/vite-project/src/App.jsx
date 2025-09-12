@@ -1,56 +1,14 @@
 import React from "react";
-import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 // ‼️ import carousel styles after core package styles
-import '@mantine/carousel/styles.css';
+import "@mantine/carousel/styles.css";
 
 import Dashboard from "./DashBoard";
-import "./index.css" // Your CSS file
-
-const theme = createTheme({
-  fontFamily: "Inter Tight, sans-serif",
-  fontFamilyMonospace: "Monaco, Courier, monospace",
-  headings: {
-    fontFamily: "Poppins, sans-serif",
-    fontWeight: "600",
-  },
-
-  colors: {
-    // Define your custom color palette
-    primary: [
-      "#e6f9fb",
-      "#ccf2f6",
-      "#99e6ed",
-      "#66d9e4",
-      "#33cddb",
-      "#0090A0", // Your primary color at index 5 (default)
-      "#007a87",
-      "#00656e",
-      "#004f55",
-      "#003a3c",
-    ],
-  },
-
-  primaryColor: "primary",
-
-  other: {
-    // Store your custom CSS variables for easy access
-    background1: "var(--color-background1)",
-    background2: "var(--color-background2)",
-  },
-
-  breakpoints: {
-    xs: "36em",
-    sm: "48em",
-    md: "62em",
-    lg: "75em",
-    xl: "88em",
-  },
-});
+import "./index.css"; // Your CSS file
 
 const App = () => {
   return (
-    <MantineProvider theme={theme}>
+    <>
       {/* On small screens (mobile-first), it's a single column (default).
           On 'md' screens and larger, we switch to a 2-column grid. */}
       <div className="md:grid md:grid-cols-[16rem_1fr] min-h-screen font-poppins">
@@ -72,27 +30,45 @@ const App = () => {
               MAIN MENU
             </p>
             {/* Using text-base ensures fonts scale with user's browser settings */}
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-compass w-5 text-center"></i>
               <span>Overview</span>
             </a>
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-credit-card w-5 text-center"></i>
               <span>Cards</span>
             </a>
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-dollar-sign w-5 text-center"></i>
               <span>Budget</span>
             </a>
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-chart-simple w-5 text-center"></i>
               <span>Statistics</span>
             </a>
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-book w-5 text-center"></i>
               <span>Report</span>
             </a>
-            <a href="#" className="menu-button text-base flex items-center gap-3">
+            <a
+              href="#"
+              className="menu-button text-base flex items-center gap-3"
+            >
               <i className="fa-solid fa-money-bill-transfer w-5 text-center"></i>
               <span>Transactions</span>
             </a>
@@ -124,7 +100,7 @@ const App = () => {
           <Dashboard />
         </div>
       </div>
-    </MantineProvider>
+    </>
   );
 };
 

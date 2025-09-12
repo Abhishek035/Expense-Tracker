@@ -196,7 +196,7 @@ const DashBoard = () => {
             </div>
           </div>
         </div>
-        <div className="sm:col-[2_/_span_1] sm:row-[1_/_span_1]">
+        <div className="sm:col-[2_/_span_1] sm:row-[1_/_span_1 flex flex-col bg-white rounded-lg pt-3 pl-3 pr-4 shadow-sm border border-gray-100 h-full">
           <Cards />
         </div>
         <div className="sm:col-[1_/_span_1] sm:row-[2_/_span_1] min-h-[200px]">

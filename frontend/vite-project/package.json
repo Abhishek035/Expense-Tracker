@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
+    "@fortawesome/free-solid-svg-icons": "^7.0.1",
+    "@fortawesome/react-fontawesome": "^3.0.2",
     "@mantine/carousel": "^8.3.0",
     "@mantine/core": "^8.3.0",
     "@mantine/hooks": "^8.3.0",
