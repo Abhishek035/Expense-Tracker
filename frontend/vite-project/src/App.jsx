@@ -2,6 +2,7 @@ import React from "react";
 import "@mantine/core/styles.css";
 // ‼️ import carousel styles after core package styles
 import "@mantine/carousel/styles.css";
+import '@mantine/charts/styles.css';
 
 import Dashboard from "./DashBoard";
 import "./index.css"; // Your CSS file

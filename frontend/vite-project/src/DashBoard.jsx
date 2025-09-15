@@ -12,7 +12,7 @@ import {
 import Cards from "./dashboard/Cards";
 import FinStats from "./dashboard/FinStats";
 import Recurring from "./dashboard/Recurring";
-import LastTransaction from "./dashboard/LastTransaction";
+import DivisionbyCategories from "./dashboard/DivisionbyCategories";
 
 const balanceData = [
   { value: 52000 },
@@ -205,8 +205,8 @@ const DashBoard = () => {
         <div className="sm:col-[1_/_span_1] sm:row-[3_/_span_1]">
           <Recurring />
         </div>
-        <div className="sm:col-[2_/_span_1] sm:row-[2_/_span_2] border-2 rounded-xl">
-          <LastTransaction />
+        <div className="sm:col-[2_/_span_1] sm:row-[2_/_span_2] bg-white h-full">
+          <DivisionbyCategories />
         </div>
       </div>
     </div>

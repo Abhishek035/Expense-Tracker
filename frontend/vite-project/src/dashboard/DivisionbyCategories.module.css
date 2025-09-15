@@ -1,0 +1,108 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f1f3f4;
+  box-shadow: var(--mantine-breakpoint-);
+}
+
+.header {
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #2c2e33;
+  text-align: center;
+  flex: 1;
+}
+
+.chartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 180px;
+}
+
+.legendContainer {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f3f4;
+}
+
+.legendItem {
+  background: #f8f9fa;
+  border-radius: 16px;
+  padding: 4px 8px;
+  margin: 2px;
+  min-width: fit-content;
+}
+
+.colorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendText {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.legendValue {
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0090A0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 48em) {
+  .container {
+    padding: 12px;
+  }
+  
+  .title {
+    font-size: 14px;
+  }
+  
+  .chartContainer {
+    min-height: 150px;
+  }
+  
+  .legendText,
+  .legendValue {
+    font-size: 10px;
+  }
+  
+  .legendItem {
+    padding: 3px 6px;
+  }
+}
+
+.customTooltip {
+  background: rgba(30, 30, 30, 0.9);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tooltipLabel {
+  color: white;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0;
+}
