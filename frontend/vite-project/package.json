@@ -17,6 +17,7 @@
     "@mantine/charts": "^8.3.1",
     "@mantine/core": "^8.3.1",
     "@mantine/hooks": "^8.3.0",
+    "@mantinex/mantine-logo": "^2.0.0",
     "@tabler/icons-react": "^3.34.1",
     "@tailwindcss/vite": "^4.1.12",
     "embla-carousel": "^8.6.0",

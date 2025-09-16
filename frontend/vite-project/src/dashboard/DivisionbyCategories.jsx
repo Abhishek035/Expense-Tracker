@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Pie, PieChart, Cell, Tooltip } from 'recharts';
-import { ActionIcon, Text, Box, Group, Flex } from '@mantine/core';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import styles from './DivisionbyCategories.module.css';
+import React, { useState } from "react";
+import { Pie, PieChart, Cell, Tooltip } from "recharts";
+import { ActionIcon, Text, Box, Group, Flex } from "@mantine/core";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import styles from "./DivisionbyCategories.module.css";
 
 const incomeData = [
   { name: "Salary", value: 65, color: "#0090A0" },
@@ -20,24 +20,62 @@ const expenseData = [
   { name: "Other", value: 5, color: "#e6f9fb" },
 ];
 
-// Custom Tooltip Component
+const getContrastYIQ = (hexcolor) => {
+  hexcolor = hexcolor.replace("#", "");
+  const r = parseInt(hexcolor.substr(0, 2), 16);
+  const g = parseInt(hexcolor.substr(2, 2), 16);
+  const b = parseInt(hexcolor.substr(4, 2), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? "black" : "white";
+};
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  payload,
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-(midAngle ?? 0) * RADIAN);
+  const y = cy + radius * Math.sin(-(midAngle ?? 0) * RADIAN);
+
+  const textColor = getContrastYIQ(payload.color);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={textColor}
+      textAnchor={"middle"}
+      dominantBaseline="central"
+    >
+      {`${((percent ?? 1) * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
-      <div className={styles.customTooltip}>
-        <p className={styles.tooltipLabel}>{`${payload[0].name} : ${payload[0].value}%`}</p>
+      <div className="bg-primary text-white p-3 rounded-lg shadow-lg">
+        <p className="text-var(--color-primary)">{`${data.name} ${data.value}%`}</p>
       </div>
     );
   }
-
   return null;
 };
 
 const DivisionbyCategories = () => {
-  const [activeTab, setActiveTab] = useState('income');
+  const [activeTab, setActiveTab] = useState("income");
 
-  const currentData = activeTab === 'income' ? incomeData : expenseData;
-  const title = activeTab === 'income' ? 'Income Categories' : 'Expense Categories';
+  const currentData = activeTab === "income" ? incomeData : expenseData;
+  const title =
+    activeTab === "income" ? "Income Categories" : "Expense Categories";
 
   return (
     <Box className={styles.container}>
@@ -46,19 +84,21 @@ const DivisionbyCategories = () => {
         <ActionIcon
           variant="subtle"
           color="primary"
-          onClick={() => setActiveTab(activeTab === 'income' ? 'expense' : 'income')}
+          onClick={() =>
+            setActiveTab(activeTab === "income" ? "expense" : "income")
+          }
         >
           <IconChevronLeft size={16} />
         </ActionIcon>
 
-        <Text className={styles.title}>
-          {title}
-        </Text>
+        <Text className={styles.title}>{title}</Text>
 
         <ActionIcon
           variant="subtle"
           color="primary"
-          onClick={() => setActiveTab(activeTab === 'income' ? 'expense' : 'income')}
+          onClick={() =>
+            setActiveTab(activeTab === "income" ? "expense" : "income")
+          }
         >
           <IconChevronRight size={16} />
         </ActionIcon>
@@ -66,13 +106,15 @@ const DivisionbyCategories = () => {
 
       {/* Chart container */}
       <Box className={styles.chartContainer}>
-        <PieChart width={180} height={180}>
+        <PieChart width={300} height={300}>
           <Pie
             data={currentData}
-            cx={90}
-            cy={90}
-            innerRadius={35}
-            outerRadius={70}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            innerRadius={75}
+            outerRadius={130}
             paddingAngle={2}
             dataKey="value"
           >
@@ -94,12 +136,8 @@ const DivisionbyCategories = () => {
                 className={styles.colorDot}
                 style={{ backgroundColor: item.color }}
               />
-              <Text className={styles.legendText}>
-                {item.name}
-              </Text>
-              <Text className={styles.legendValue}>
-                {item.value}%
-              </Text>
+              <Text className={styles.legendText}>{item.name}</Text>
+              <Text className={styles.legendValue}>{item.value}%</Text>
             </Group>
           ))}
         </Flex>

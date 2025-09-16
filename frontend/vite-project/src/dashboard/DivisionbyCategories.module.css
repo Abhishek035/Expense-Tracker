@@ -7,7 +7,6 @@
   padding: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #f1f3f4;
-  box-shadow: var(--mantine-breakpoint-);
 }
 
 .header {
@@ -47,9 +46,9 @@
 }
 
 .colorDot {
-  width: 8px;
+  width: 1rem;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 10%;
   flex-shrink: 0;
 }
 
