@@ -6,6 +6,12 @@
   background-color: var(--color-primary);
 }
 
+@media (max-width: $mantine-breakpoint-sm) {
+  .navbar {
+    display: none;
+  }
+}
+
 .navbarMain {
   flex: 1;
 }

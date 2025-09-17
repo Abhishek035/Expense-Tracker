@@ -4,14 +4,12 @@ import {
   IconHomeFilled,
   IconChartDonutFilled,
   IconCreditCardFilled,
-  IconKey,
   IconLogout,
   IconCurrencyDollar,
   IconSettings,
   IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { Group } from '@mantine/core';
-import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from './Navbar.module.css';
 
 const data = [

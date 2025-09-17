@@ -30,11 +30,6 @@ const App = () => {
         */}
         <div className="p-6">
           {/* A button or mobile menu would go here for small screens */}
-          <div className="md:hidden text-left">
-            <button className="text-2xl">
-              <i className="fa-solid fa-bars"></i>
-            </button>
-          </div>
           <Dashboard />
         </div>
       </div>

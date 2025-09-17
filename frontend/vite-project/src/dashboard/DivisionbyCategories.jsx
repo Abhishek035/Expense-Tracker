@@ -75,7 +75,7 @@ const DivisionbyCategories = () => {
 
   const currentData = activeTab === "income" ? incomeData : expenseData;
   const title =
-    activeTab === "income" ? "Income Categories" : "Expense Categories";
+    activeTab === "income" ? "Income Breakdown" : "Expense Breakdown";
 
   return (
     <Box className={styles.container}>

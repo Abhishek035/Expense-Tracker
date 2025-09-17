@@ -38,10 +38,10 @@ const theme = createTheme({
 
   breakpoints: {
     xs: "36em",
-    sm: "48em",
-    md: "62em",
-    lg: "75em",
-    xl: "88em",
+    sm: "40em",
+    md: "48em",
+    lg: "64em",
+    xl: "80em",
   },
 });
 

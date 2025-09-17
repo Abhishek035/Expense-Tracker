@@ -13,6 +13,7 @@ import Cards from "./dashboard/Cards";
 import FinStats from "./dashboard/FinStats";
 import Recurring from "./dashboard/Recurring";
 import DivisionbyCategories from "./dashboard/DivisionbyCategories";
+import Header from "./Header";
 
 const balanceData = [
   { value: 52000 },
@@ -67,7 +68,7 @@ const expenseData = [
 const DashBoard = () => {
   return (
     <div className="flex flex-col sm:grid sm:grid-rows-[2.5rem_1fr] min-h-full">
-      <div>Header</div>
+      <div className="row-[1_/_span_1]"><Header /></div>
       <div className="grid sm:grid-rows-[2fr_1.5fr_1.5fr] sm:grid-cols-[3fr_2fr] gap-4 h-[100%]">
         <div className="sm:col-[1_/_span_1] sm:row-[1_/_span_1] grid sm:grid-cols-2 sm:grid-rows-2 gap-4">
           {/* Balance Card */}
