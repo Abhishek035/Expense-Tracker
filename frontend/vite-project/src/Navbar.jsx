@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Icon2fa,
   IconHomeFilled,
@@ -8,20 +8,22 @@ import {
   IconCurrencyDollar,
   IconSettings,
   IconSwitchHorizontal,
-} from '@tabler/icons-react';
-import { Group } from '@mantine/core';
-import classes from './Navbar.module.css';
+  IconSquareRoundedPlusFilled,
+} from "@tabler/icons-react";
+import { Group } from "@mantine/core";
+import classes from "./Navbar.module.css";
 
 const data = [
-  { link: '', label: 'Overview', icon: IconHomeFilled },
-  { link: '', label: 'Cards', icon: IconCreditCardFilled },
-  { link: '', label: 'Statistics', icon: IconChartDonutFilled },
-  { link: '', label: 'Transactions', icon: IconCurrencyDollar },
-  { link: '', label: 'Other Settings', icon: IconSettings },
+  { link: "", label: "Overview", icon: IconHomeFilled },
+  { link: "", label: "Add Transaction", icon: IconSquareRoundedPlusFilled, action: 'openModal' },
+  { link: "", label: "Cards", icon: IconCreditCardFilled },
+  { link: "", label: "Statistics", icon: IconChartDonutFilled },
+  { link: "", label: "Transactions", icon: IconCurrencyDollar },
+  { link: "", label: "Other Settings", icon: IconSettings },
 ];
 
-export function Navbar() {
-  const [active, setActive] = useState('Overview');
+export function Navbar({ onAddTransactionClick }) {
+  const [active, setActive] = useState("Overview");
 
   const links = data.map((item) => (
     <a
@@ -31,7 +33,13 @@ export function Navbar() {
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
-        setActive(item.label);
+        if (item.action === 'openModal') {
+          onAddTransactionClick();
+        } else {
+          // Otherwise, just set the active link for navigation
+          setActive(item.label);
+          // In a real app, you would also navigate here using React Router, etc.
+        }
       }}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
@@ -49,12 +57,20 @@ export function Navbar() {
       </div>
 
       <div className={classes.footer}>
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
+        <a
+          href="#"
+          className={classes.link}
+          onClick={(event) => event.preventDefault()}
+        >
           <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
           <span>Change account</span>
         </a>
 
-        <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
+        <a
+          href="#"
+          className={classes.link}
+          onClick={(event) => event.preventDefault()}
+        >
           <IconLogout className={classes.linkIcon} stroke={1.5} />
           <span>Logout</span>
         </a>

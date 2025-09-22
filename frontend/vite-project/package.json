@@ -16,6 +16,8 @@
     "@mantine/carousel": "^8.3.1",
     "@mantine/charts": "^8.3.1",
     "@mantine/core": "^8.3.1",
+    "@mantine/dates": "^8.3.1",
+    "@mantine/form": "^8.3.1",
     "@mantine/hooks": "^8.3.0",
     "@mantinex/mantine-logo": "^2.0.0",
     "@tabler/icons-react": "^3.34.1",

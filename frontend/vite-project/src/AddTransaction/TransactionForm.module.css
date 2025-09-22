@@ -1,0 +1,76 @@
+/* TransactionForm.module.css */
+
+/* Modal Styles */
+.modalHeader {
+  /* Use the primary color from your theme for a solid, clean background */
+  background-color: var(--mantine-color-primary-filled);
+  margin: 0;
+}
+
+.modalTitle {
+  /* White text is generally best on a dark primary color background */
+  color: var(--mantine-color-white);
+  font-weight: 600;
+}
+
+.modalBody {
+  /* Use a slightly different background for the body if desired */
+  background-color: var(--mantine-color-gray-0);
+}
+
+/* Make body background adapt to dark mode */
+[data-mantine-color-scheme='dark'] .modalBody {
+  background-color: var(--mantine-color-dark-8);
+}
+
+/* Tabs Styles */
+.tabsList {
+  /* A subtle background for the tab list container */
+  background-color: var(--mantine-color-gray-1);
+  border-radius: var(--mantine-radius-md);
+  padding: 4px;
+}
+
+[data-mantine-color-scheme='dark'] .tabsList {
+  background-color: var(--mantine-color-dark-6);
+}
+
+.tab {
+  border-radius: var(--mantine-radius-sm) !important;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border: none !important;
+}
+
+/* When a tab is active, Mantine applies styles via the `color` prop. 
+   No extra CSS for active state is needed! */
+
+
+/* A box for less-frequently used options */
+.advancedOptionsBox {
+  background-color: var(--mantine-color-gray-1);
+  padding: var(--mantine-spacing-md);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-2);
+}
+
+[data-mantine-color-scheme='dark'] .advancedOptionsBox {
+  background-color: var(--mantine-color-dark-6);
+  border-color: var(--mantine-color-dark-5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalBody {
+    padding: var(--mantine-spacing-md);
+  }
+}
+
+@media (max-width: 480px) {
+  /* On very small screens, make the modal take up more space */
+  .modal {
+    margin: var(--mantine-spacing-xs);
+    width: calc(100vw - (var(--mantine-spacing-xs) * 2));
+    max-width: none;
+  }
+}

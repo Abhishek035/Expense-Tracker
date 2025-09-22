@@ -1,14 +1,19 @@
 import React from "react";
+import { useDisclosure } from "@mantine/hooks";
 import "@mantine/core/styles.css";
 // ‼️ import carousel styles after core package styles
 import "@mantine/carousel/styles.css";
-import '@mantine/charts/styles.css';
+import "@mantine/charts/styles.css";
 
 import Dashboard from "./DashBoard";
 import "./index.css"; // Your CSS file
 import Navbar from "./Navbar";
+import TransactionForm from "./AddTransaction/TransactionForm";
 
 const App = () => {
+  const [modalOpened, { open: openModal, close: closeModal }] =
+    useDisclosure(false);
+
   return (
     <>
       {/* On small screens (mobile-first), it's a single column (default).
@@ -21,7 +26,7 @@ const App = () => {
           - This approach is superior to col-span for a primary sidebar because the sidebar's width remains predictable and ideal for its content, while the main content area is fluid.
         */}
 
-        <Navbar />
+        <Navbar onAddTransactionClick={openModal} />
 
         {/* 
           Column 2: Main Content.
@@ -31,6 +36,7 @@ const App = () => {
         <div className="p-6">
           {/* A button or mobile menu would go here for small screens */}
           <Dashboard />
+          <TransactionForm opened={modalOpened} onClose={closeModal} />
         </div>
       </div>
     </>
