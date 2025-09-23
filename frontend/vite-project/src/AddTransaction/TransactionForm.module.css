@@ -28,7 +28,6 @@
   /* A subtle background for the tab list container */
   background-color: var(--mantine-color-gray-1);
   border-radius: var(--mantine-radius-md);
-  padding: 4px;
 }
 
 [data-mantine-color-scheme='dark'] .tabsList {
@@ -36,10 +35,8 @@
 }
 
 .tab {
-  border-radius: var(--mantine-radius-sm) !important;
   font-weight: 500;
   transition: background-color 0.2s ease, color 0.2s ease;
-  border: none !important;
 }
 
 /* When a tab is active, Mantine applies styles via the `color` prop. 

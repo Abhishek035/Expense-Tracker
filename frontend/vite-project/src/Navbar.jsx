@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   Icon2fa,
   IconHomeFilled,
@@ -9,43 +9,62 @@ import {
   IconSettings,
   IconSwitchHorizontal,
   IconSquareRoundedPlusFilled,
+  IconHomeDollar,
 } from "@tabler/icons-react";
 import { Group } from "@mantine/core";
 import classes from "./Navbar.module.css";
 
 const data = [
-  { link: "", label: "Overview", icon: IconHomeFilled },
-  { link: "", label: "Add Transaction", icon: IconSquareRoundedPlusFilled, action: 'openModal' },
-  { link: "", label: "Cards", icon: IconCreditCardFilled },
+  { to: "/", label: "Overview", icon: IconHomeFilled },
+  {
+    to: "/add-transaction",
+    label: "Add Transaction",
+    icon: IconSquareRoundedPlusFilled,
+    action: "openModal",
+  },
+  { to: "/accounts", label: "All accounts", icon: IconHomeDollar }, // <-- This is our new route
+  { to: "/credit-cards", label: "Credit Cards", icon: IconCreditCardFilled },
   { link: "", label: "Statistics", icon: IconChartDonutFilled },
   { link: "", label: "Transactions", icon: IconCurrencyDollar },
   { link: "", label: "Other Settings", icon: IconSettings },
 ];
 
 export function Navbar({ onAddTransactionClick }) {
-  const [active, setActive] = useState("Overview");
 
-  const links = data.map((item) => (
-    <a
-      className={classes.link}
-      data-active={item.label === active || undefined}
-      href={item.link}
-      key={item.label}
-      onClick={(event) => {
-        event.preventDefault();
-        if (item.action === 'openModal') {
-          onAddTransactionClick();
-        } else {
-          // Otherwise, just set the active link for navigation
-          setActive(item.label);
-          // In a real app, you would also navigate here using React Router, etc.
+  const links = data.map((item) => {
+    // If the item is just for opening a modal, render it as a button-like <a> tag
+    if (item.action === "openModal") {
+      return (
+        <a
+          className={classes.link}
+          href="#"
+          key={item.label}
+          onClick={(event) => {
+            event.preventDefault();
+            onAddTransactionClick();
+          }}
+        >
+          <item.icon className={classes.linkIcon} stroke={1.5} />
+          <span>{item.label}</span>
+        </a>
+      );
+    }
+
+    // Otherwise, render a NavLink for actual navigation
+    return (
+      <NavLink
+        to={item.to}
+        key={item.label}
+        className={({ isActive }) =>
+          `${classes.link} ${isActive ? classes.active : ""}`
         }
-      }}
-    >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
-      <span>{item.label}</span>
-    </a>
-  ));
+        // The above line combines the base class with an 'active' class if the link matches the URL
+      >
+        <item.icon className={classes.linkIcon} stroke={1.5} />
+        <span>{item.label}</span>
+      </NavLink>
+    );
+  });
 
   return (
     <nav className={classes.navbar}>

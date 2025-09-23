@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Modal,
   Tabs,
-  TextInput,
   NumberInput,
   Select,
   Textarea,
@@ -39,7 +38,8 @@ const TransactionForm = ({ opened, onClose }) => {
       paymentFrom: "",
       frequency: "",
       endDate: null,
-      status: "cleared", // Default to cleared for faster entry
+      // NEW: Added approval status to the form's state
+      approvalStatus: "approved",
       tags: [],
       receipt: null,
     },
@@ -53,6 +53,9 @@ const TransactionForm = ({ opened, onClose }) => {
           : null,
       frequency: (value) =>
         isRecurring && !value ? "Frequency is required when recurring" : null,
+      // NEW: Add validation for the new field
+      approvalStatus: (value) =>
+        isRecurring && !value ? "Approval status is required" : null,
     },
   });
 
@@ -71,9 +74,16 @@ const TransactionForm = ({ opened, onClose }) => {
     ],
   };
 
-  const paymentSources = ["Wallet", "Bank Account", "Credit Card", "Debit Card"];
+  const paymentSources = [
+    "Wallet",
+    "Bank Account",
+    "Credit Card",
+    "Debit Card",
+  ];
   const frequencies = ["Daily", "Weekly", "Monthly", "Yearly"];
-  const statusOptions = ["Cleared", "Pending"];
+  
+  // NEW: Options for the approval status
+  const approvalStatusOptions = ["Approved", "Pending"];
 
   const handleSubmit = (values) => {
     const transactionData = {
@@ -81,6 +91,12 @@ const TransactionForm = ({ opened, onClose }) => {
       type: transactionType,
       recurring: isRecurring,
     };
+    // If it's not a recurring transaction, we can remove the approval status
+    if (!isRecurring) {
+      delete transactionData.approvalStatus;
+      delete transactionData.frequency;
+      delete transactionData.endDate;
+    }
     console.log("Transaction Data:", transactionData);
     onClose(); // Close the modal on submission
   };
@@ -166,7 +182,9 @@ const TransactionForm = ({ opened, onClose }) => {
           </Grid>
 
           <Grid>
-            <Grid.Col span={{ base: 12, md: transactionType === 'expense' ? 6 : 12 }}>
+            <Grid.Col
+              span={{ base: 12, md: transactionType === "expense" ? 6 : 12 }}
+            >
               <Select
                 label="Category"
                 placeholder="Select a category"
@@ -179,7 +197,7 @@ const TransactionForm = ({ opened, onClose }) => {
             {transactionType === "expense" && (
               <Grid.Col span={{ base: 12, md: 6 }}>
                 <Select
-                  label="Payment From"
+                  label="Payment Method"
                   placeholder="Select a source"
                   required
                   data={paymentSources}
@@ -191,7 +209,7 @@ const TransactionForm = ({ opened, onClose }) => {
 
           <Textarea
             label="Description"
-            placeholder="Add a note (e.g., coffee with a client)"
+            placeholder="Add a short note (e.g., Netflix subscription)"
             minRows={2}
             {...form.getInputProps("description")}
           />
@@ -214,19 +232,29 @@ const TransactionForm = ({ opened, onClose }) => {
                     {...form.getInputProps("frequency")}
                   />
                 </Grid.Col>
+                {/* NEW: Approval Status field */}
                 <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Select
+                    label="Approval Status"
+                    placeholder="Set approval status"
+                    required={isRecurring}
+                    data={approvalStatusOptions}
+                    {...form.getInputProps("approvalStatus")}
+                  />
+                </Grid.Col>
+                <Grid.Col span={12}>
                   <DateInput
                     label="End Date (Optional)"
-                    placeholder="Leave blank for never"
+                    placeholder="Leave blank to repeat indefinitely"
                     {...form.getInputProps("endDate")}
                   />
                 </Grid.Col>
               </Grid>
             )}
           </Box>
-          
+
           <Grid>
-             <Grid.Col span={{ base: 12, md: 6 }}>
+            <Grid.Col span={{ base: 12, md: 6 }}>
               <TagsInput
                 label="Tags (Optional)"
                 placeholder="Press Enter to add a tag"

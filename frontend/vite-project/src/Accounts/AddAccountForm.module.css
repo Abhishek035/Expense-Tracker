@@ -1,0 +1,13 @@
+.modalHeader {
+  background-color: var(--color-primary);
+}
+
+.modalTitle {
+  color: white;
+  font-family: var(--font-poppins);
+}
+
+/* Dark Mode styles */
+[data-mantine-color-scheme='dark'] .modalHeader {
+  background-color: var(--color-primary-dark);
+}

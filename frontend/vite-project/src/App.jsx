@@ -9,6 +9,8 @@ import Dashboard from "./DashBoard";
 import "./index.css"; // Your CSS file
 import Navbar from "./Navbar";
 import TransactionForm from "./AddTransaction/TransactionForm";
+import { AccountsPage } from "./Accounts/AccountsPage";
+import { Route, Routes } from "react-router-dom";
 
 const App = () => {
   const [modalOpened, { open: openModal, close: closeModal }] =
@@ -16,8 +18,6 @@ const App = () => {
 
   return (
     <>
-      {/* On small screens (mobile-first), it's a single column (default).
-          On 'md' screens and larger, we switch to a 2-column grid. */}
       <div className="md:grid md:grid-cols-[16rem_1fr] min-h-screen font-poppins">
         {/* 
           Column 1: Sidebar.
@@ -34,9 +34,12 @@ const App = () => {
           - When you zoom, the browser recalculates the available space, and this column will reflow naturally.
         */}
         <div className="p-6">
-          {/* A button or mobile menu would go here for small screens */}
-          <Dashboard />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/accounts" element={<AccountsPage />} />
+          </Routes>
           <TransactionForm opened={modalOpened} onClose={closeModal} />
+          {/* A button or mobile menu would go here for small screens */}
         </div>
       </div>
     </>

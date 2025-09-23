@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { MantineProvider, createTheme } from "@mantine/core";
+import { BrowserRouter } from "react-router-dom";
 
 const theme = createTheme({
   fontFamily: "Inter Tight, sans-serif",
@@ -47,8 +48,10 @@ const theme = createTheme({
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <MantineProvider theme={theme}>
-      <App />
-    </MantineProvider>
+    <BrowserRouter>
+      <MantineProvider theme={theme}>
+        <App />
+      </MantineProvider>
+    </BrowserRouter>
   </StrictMode>
 );
