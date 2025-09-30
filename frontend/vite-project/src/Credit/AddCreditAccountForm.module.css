@@ -1,0 +1,7 @@
+.submitButton {
+  background-color: var(--color-primary);
+}
+
+.submitButton:hover {
+  background-color: #007a87; /* A slightly darker shade from your palette */
+}

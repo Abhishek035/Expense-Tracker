@@ -10,6 +10,7 @@ import "./index.css"; // Your CSS file
 import Navbar from "./Navbar";
 import TransactionForm from "./AddTransaction/TransactionForm";
 import { AccountsPage } from "./Accounts/AccountsPage";
+import { CreditPage } from "./Credit/CreditPage";
 import { Route, Routes } from "react-router-dom";
 
 const App = () => {
@@ -37,6 +38,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/accounts" element={<AccountsPage />} />
+            <Route path="/credit-cards" element={<CreditPage />} />
           </Routes>
           <TransactionForm opened={modalOpened} onClose={closeModal} />
           {/* A button or mobile menu would go here for small screens */}

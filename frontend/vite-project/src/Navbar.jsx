@@ -24,9 +24,9 @@ const data = [
   },
   { to: "/accounts", label: "All accounts", icon: IconHomeDollar }, // <-- This is our new route
   { to: "/credit-cards", label: "Credit Cards", icon: IconCreditCardFilled },
-  { link: "", label: "Statistics", icon: IconChartDonutFilled },
-  { link: "", label: "Transactions", icon: IconCurrencyDollar },
-  { link: "", label: "Other Settings", icon: IconSettings },
+  { to: "/statistics", label: "Statistics", icon: IconChartDonutFilled },
+  { to: "/transactions", label: "Transactions", icon: IconCurrencyDollar },
+  { to: "/settings", label: "Other Settings", icon: IconSettings },
 ];
 
 export function Navbar({ onAddTransactionClick }) {

@@ -1,0 +1,18 @@
+.header {
+  margin-bottom: var(--mantine-spacing-xl);
+}
+
+.title {
+  color: var(--color-text);
+  font-family: var(--font-poppins);
+}
+
+/* Responsive alignment for action buttons */
+.actions {
+  margin-left: auto;
+
+  @media (max-width: theme.breakpoints.sm) {
+    margin-left: 0;
+    margin-top: var(--mantine-spacing-md);
+  }
+}

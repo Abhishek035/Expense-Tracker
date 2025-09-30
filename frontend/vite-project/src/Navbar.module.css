@@ -64,6 +64,15 @@
       }
     }
   }
+
+  &.active {
+    background-color: var(--mantine-color-white);
+      color: var(--color-primary);
+
+      .linkIcon {
+        color: var(--mantine-color-primary)
+      }
+  }
 }
 
 .linkIcon {
