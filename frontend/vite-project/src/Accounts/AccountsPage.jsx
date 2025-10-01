@@ -7,15 +7,12 @@ import { AddAccountForm } from "./AddAccountForm";
 
 // Placeholder data with lowercase status for easier filtering
 const initialAccounts = [
-    { id: 1, type: "E-Wallet", nickname: "Paytm Wallet", balance: 769.86, provider: "Paytm", status: "active" },
+    { id: 1, type: "Wallet", nickname: "Paytm Wallet", balance: 769.86, provider: "Paytm", status: "active" },
     { id: 2, type: "Bank Account", nickname: "Salary Account", balance: 15984.5, bankName: "HDFC Bank", status: "active" },
-    { id: 3, type: "Debit Card", nickname: "SBI Shopping Card", balance: 314.75, bankName: "State Bank of India", last4: "1234", network: "Visa", status: "active" },
-    { id: 4, type: "Bank Account", nickname: "Old Savings", balance: 1250.0, bankName: "ICICI Bank", status: "archived" },
-    { id: 5, type: "E-Wallet", nickname: "GPay", balance: 2500.5, provider: "Google Pay", status: "active" },
-    { id: 6, type: "Debit Card", nickname: "Axis Debit", balance: 500.0, bankName: "Axis Bank", last4: "5678", network: "Mastercard", status: "archived" },
-    { id: 7, type: "Bank Account", nickname: "Emergency Fund", balance: 50000.0, bankName: "Kotak Mahindra Bank", status: "active" },
+    { id: 3, type: "Bank Account", nickname: "Old Savings", balance: 1250.0, bankName: "ICICI Bank", status: "archived" },
+    { id: 4, type: "Wallet", nickname: "GPay", balance: 2500.5, provider: "Google Pay", status: "active" },
+    { id: 5, type: "Bank Account", nickname: "Emergency Fund", balance: 50000.0, bankName: "Kotak Mahindra Bank", status: "active" },
 ];
-
 
 export function AccountsPage() {
   const [accounts, setAccounts] = useState(initialAccounts);

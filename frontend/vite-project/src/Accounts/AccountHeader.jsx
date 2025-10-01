@@ -4,7 +4,7 @@ import { IconPlus, IconSearch, IconFilter, IconChevronDown } from '@tabler/icons
 import classes from './AccountHeader.module.css';
 
 // Data for the MultiSelect components
-const accountTypeData = ["Bank Account", "Debit Card", "E-Wallet"];
+const accountTypeData = ["Bank Account", "Wallet"];
 const archiveStatusData = [
   { value: 'active', label: 'Active' },
   { value: 'archived', label: 'Archived' },

@@ -3,7 +3,7 @@ import { Modal, Select, TextInput, NumberInput, Button, Group, Stack } from '@ma
 import { useForm } from '@mantine/form';
 import classes from './AddAccountForm.module.css';
 
-const accountTypes = ["Bank Account", "Debit Card", "E-Wallet"];
+const accountTypes = ["Bank Account", "Wallet"];
 const cardNetworks = ["Visa", "Mastercard", "RuPay", "American Express"];
 
 export function AddAccountForm({ opened, onClose, onAddAccount }) {
