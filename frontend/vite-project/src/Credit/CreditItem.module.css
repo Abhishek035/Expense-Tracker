@@ -1,13 +1,27 @@
 .card {
   background-color: var(--color-background1);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition: box-shadow 0.2s ease; /* Removed transform to avoid conflict with dnd-kit */
   border-left: 5px solid var(--color-background2);
-  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  padding: var(--mantine-spacing-md);
+  padding-left: var(--mantine-spacing-xs); /* Reduced left padding to accommodate handle */
+}
 
-  &:hover {
-    box-shadow: var(--mantine-shadow-md);
-    transform: translateY(-2px);
-  }
+.card:hover {
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--mantine-spacing-sm);
+  cursor: grab;
+  color: var(--mantine-color-gray-5);
+  touch-action: none; /* Important for touch devices */
+}
+
+.dragHandle:active {
+  cursor: grabbing;
 }
 
 .iconWrapper {
@@ -17,4 +31,18 @@
 
 .nickname {
   color: var(--color-text);
+  font-family: var(--font-poppins);
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.amount {
+  color: #ff6b6b;
+  font-weight: 600;
+  line-height: 1.2;
 }

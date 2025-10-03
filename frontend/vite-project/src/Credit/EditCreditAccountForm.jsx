@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   TextInput,
@@ -11,7 +11,12 @@ import {
 import { useForm } from "@mantine/form";
 import classes from "./AddCreditAccountForm.module.css";
 
-export function AddCreditAccountForm({ opened, onClose, onAddAccount }) {
+export function EditCreditAccountForm({
+  opened,
+  onClose,
+  onEditAccount,
+  account,
+}) {
   const form = useForm({
     initialValues: {
       nickname: "",
@@ -31,8 +36,14 @@ export function AddCreditAccountForm({ opened, onClose, onAddAccount }) {
     },
   });
 
+  useEffect(() => {
+    if (account) {
+      form.setValues(account);
+    }
+  }, [account]);
+
   const handleSubmit = (values) => {
-    onAddAccount(values);
+    onEditAccount({ ...account, ...values });
     form.reset();
     onClose();
   };
@@ -41,7 +52,7 @@ export function AddCreditAccountForm({ opened, onClose, onAddAccount }) {
     <Modal
       opened={opened}
       onClose={onClose}
-      title="Add Credit Account"
+      title="Edit Credit Account"
       centered
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -94,7 +105,7 @@ export function AddCreditAccountForm({ opened, onClose, onAddAccount }) {
               Cancel
             </Button>
             <Button type="submit" className={classes.submitButton}>
-              Add Account
+              Save Changes
             </Button>
           </Group>
         </Stack>

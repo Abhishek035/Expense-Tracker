@@ -1,8 +1,9 @@
 import React from 'react';
 import { Stack, Center, Text } from '@mantine/core';
-import { CreditItem } from './CreditItem';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableCreditItem } from './SortableCreditItem';
 
-export function CreditList({ accounts }) {
+export function CreditList({ accounts, onEdit, onDelete }) {
   if (accounts.length === 0) {
     return (
       <Center p="xl" style={{ height: '300px' }}>
@@ -12,10 +13,18 @@ export function CreditList({ accounts }) {
   }
 
   return (
-    <Stack gap="md">
-      {accounts.map((account) => (
-        <CreditItem key={account.id} account={account} />
-      ))}
-    </Stack>
+    <SortableContext items={accounts.map(a => a.id)} strategy={verticalListSortingStrategy}>
+      <Stack gap="md">
+        {accounts.map((account) => (
+          <SortableCreditItem
+            key={account.id}
+            id={account.id}
+            account={account}
+            onEdit={() => onEdit(account)}
+            onDelete={() => onDelete(account.id)}
+          />
+        ))}
+      </Stack>
+    </SortableContext>
   );
 }
