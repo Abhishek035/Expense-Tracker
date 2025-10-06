@@ -4,6 +4,7 @@
   border-left: 5px solid var(--color-background2);
   padding: var(--mantine-spacing-md);
   padding-left: var(--mantine-spacing-xs); /* Reduced left padding to accommodate handle */
+  cursor: pointer;
 }
 
 .card:hover {

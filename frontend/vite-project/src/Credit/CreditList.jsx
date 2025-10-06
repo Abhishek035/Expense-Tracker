@@ -3,7 +3,7 @@ import { Stack, Center, Text } from '@mantine/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableCreditItem } from './SortableCreditItem';
 
-export function CreditList({ accounts, onEdit, onDelete }) {
+export function CreditList({ accounts, onEdit, onDelete, expandedAccountId, onToggleExpand }) {
   if (accounts.length === 0) {
     return (
       <Center p="xl" style={{ height: '300px' }}>
@@ -22,6 +22,8 @@ export function CreditList({ accounts, onEdit, onDelete }) {
             account={account}
             onEdit={() => onEdit(account)}
             onDelete={() => onDelete(account.id)}
+            isExpanded={expandedAccountId === account.id}
+            onToggleExpand={() => onToggleExpand(account.id)}
           />
         ))}
       </Stack>
