@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack, Center, Text } from '@mantine/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { SortableCreditItem } from './SortableCreditItem';
+import { SortableCreditItem } from '../../components/SortableCreditItem';
 
 export function CreditList({ accounts, onEdit, onDelete, expandedAccountId, onToggleExpand }) {
   if (accounts.length === 0) {

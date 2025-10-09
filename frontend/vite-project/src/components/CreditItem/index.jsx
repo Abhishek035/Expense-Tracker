@@ -1,41 +1,18 @@
 import React from "react";
 import { Card, Text, Group, Badge, ActionIcon, Menu, Collapse } from "@mantine/core";
-import {
-  IconCreditCard,
-  IconDotsVertical,
-  IconEye,
-  IconEdit,
-  IconTrash,
-  IconGripVertical,
-  IconCalendar,
-} from "@tabler/icons-react";
-import { CreditItemDetails } from "./CreditItemDetails";
-import classes from "./CreditItem.module.css";
+import { IconCreditCard, IconDotsVertical, IconEye, IconEdit, IconTrash, IconGripVertical, IconCalendar } from "@tabler/icons-react";
+import { CreditItemDetails } from "../CreditItemDetails";
+import classes from "./index.module.css";
 
 export const CreditItem = React.forwardRef(
   ({ account, onEdit, onDelete, isExpanded, onToggleExpand, style, dragAttributes, dragListeners, ...props }, ref) => {
-
     const handleEyeClick = (e) => {
       e.stopPropagation();
       onToggleExpand();
     };
-    
-    const formattedCreationDate = new Date(account.creationDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
 
     return (
-      <Card
-        withBorder
-        radius="md"
-        className={classes.card}
-        ref={ref}
-        style={style}
-        {...props}
-        onClick={onToggleExpand}
-      >
+      <Card withBorder radius="md" className={classes.card} ref={ref} style={style} {...props} onClick={onToggleExpand}>
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group align="center" wrap="nowrap">
             <div className={classes.dragHandle} {...dragAttributes} {...dragListeners}>
@@ -46,7 +23,6 @@ export const CreditItem = React.forwardRef(
               <div>
                 <Text fz="lg" fw={600} className={classes.nickname}>{account.nickname}</Text>
                 <Text fz="sm" c="dimmed">{account.provider} {account.last4 ? `• • • • ${account.last4}` : ""}</Text>
-                <Text fz="xs" c="dimmed" mt={4} className={classes.date}><IconCalendar size={12} style={{ marginRight: 4 }}/>Opened: {formattedCreationDate}</Text>
                 <Group gap="xs" mt="sm">
                   <Badge variant="light" color="primary" size="sm" radius="sm">{account.accountType}</Badge>
                   {account.network && <Badge variant="light" color="gray" size="sm" radius="sm">{account.network}</Badge>}

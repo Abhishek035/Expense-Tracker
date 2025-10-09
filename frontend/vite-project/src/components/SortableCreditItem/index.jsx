@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { CreditItem } from './CreditItem';
+import { CreditItem } from '../../components/CreditItem';
 
 export function SortableCreditItem(props) {
   const {

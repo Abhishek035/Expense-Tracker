@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import classes from "./CreditItemDetails.module.css";
+import classes from "./index.module.css";
 
 const timeframeOptions = ["5D", "1M", "6M", "1Y", "5Y", "Max"];
 
@@ -57,8 +57,6 @@ export function CreditItemDetails({ account }) {
     account.transactions.length > 0
       ? account.transactions[account.transactions.length - 1]
       : { amount: "N/A", date: "N/A" };
-
-  // Dynamic interval for X-axis ticks to prevent congestion
   const tickInterval = Math.max(1, Math.floor(chartData.length / 7));
 
   return (

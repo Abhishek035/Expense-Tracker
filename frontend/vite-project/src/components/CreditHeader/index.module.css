@@ -16,3 +16,11 @@
     margin-top: var(--mantine-spacing-md);
   }
 }
+
+.addButton {
+  background-color: var(--mantine-color-primary-light);
+}
+
+.addButton:hover {
+  background-color: var(--mantine-color-blue-7);
+}

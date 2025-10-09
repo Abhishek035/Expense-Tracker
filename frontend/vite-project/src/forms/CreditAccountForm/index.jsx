@@ -1,22 +1,11 @@
 import React, { useEffect } from "react";
-import {
-  Modal,
-  TextInput,
-  Select,
-  Group,
-  Button,
-  Stack,
-  NumberInput,
-} from "@mantine/core";
+import { Modal, TextInput, Select, Group, Button, Stack, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import classes from "./AddCreditAccountForm.module.css";
+import classes from "./index.module.css";
 
-export function EditCreditAccountForm({
-  opened,
-  onClose,
-  onEditAccount,
-  account,
-}) {
+export function CreditAccountForm({ opened, onClose, onSubmit, account }) {
+  const isEditing = !!account;
+
   const form = useForm({
     initialValues: {
       nickname: "",
@@ -27,23 +16,23 @@ export function EditCreditAccountForm({
       amount: "",
     },
     validate: {
-      nickname: (value) =>
-        value.trim().length > 0 ? null : "Nickname is required",
-      provider: (value) =>
-        value.trim().length > 0 ? null : "Provider is required",
+      nickname: (value) => (value.trim().length > 0 ? null : "Nickname is required"),
+      provider: (value) => (value.trim().length > 0 ? null : "Provider is required"),
       accountType: (value) => (value ? null : "Account type is required"),
       amount: (value) => (value > 0 ? null : "Amount must be greater than 0"),
     },
   });
 
   useEffect(() => {
-    if (account) {
+    if (isEditing) {
       form.setValues(account);
+    } else {
+      form.reset();
     }
-  }, [account]);
+  }, [account, isEditing, opened]);
 
   const handleSubmit = (values) => {
-    onEditAccount({ ...account, ...values });
+    onSubmit({ ...account, ...values });
     form.reset();
     onClose();
   };
@@ -52,7 +41,7 @@ export function EditCreditAccountForm({
     <Modal
       opened={opened}
       onClose={onClose}
-      title="Edit Credit Account"
+      title={isEditing ? "Edit Credit Account" : "Add Credit Account"}
       centered
     >
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -105,7 +94,7 @@ export function EditCreditAccountForm({
               Cancel
             </Button>
             <Button type="submit" className={classes.submitButton}>
-              Save Changes
+              {isEditing ? "Save Changes" : "Add Account"}
             </Button>
           </Group>
         </Stack>

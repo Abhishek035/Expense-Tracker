@@ -10,7 +10,7 @@ import "./index.css"; // Your CSS file
 import Navbar from "./Navbar";
 import TransactionForm from "./AddTransaction/TransactionForm";
 import { AccountsPage } from "./Accounts/AccountsPage";
-import { CreditPage } from "./Credit/CreditPage";
+import { CreditPage } from "./pages/CreditPage";
 import { Route, Routes } from "react-router-dom";
 
 const App = () => {
