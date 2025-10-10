@@ -25,6 +25,8 @@ import {
   IconBuildingBank,
   IconFilter,
   IconChevronDown,
+  IconEdit,
+  IconTrash,
 } from "@tabler/icons-react";
 
 import { initialAccounts } from "../../data/accountsData";
@@ -168,9 +170,33 @@ export function AccountsPage() {
             <ActionIcon variant="subtle" color="gray" aria-label="View details">
               <IconEye size={18} />
             </ActionIcon>
-            <ActionIcon variant="subtle" color="gray" aria-label="More options">
-              <IconDotsVertical size={18} />
-            </ActionIcon>
+            <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                aria-label="More options"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <IconDotsVertical size={18} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<IconEdit size={14} />}
+                // onClick={() => openEditModal(account)}
+              >
+                Edit
+              </Menu.Item>
+              <Menu.Item
+                leftSection={<IconTrash size={14} />}
+                // onClick={() => handleDeleteAccount(account.id)}
+                color="red"
+              >
+                Delete
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
           </>
         }
       />
