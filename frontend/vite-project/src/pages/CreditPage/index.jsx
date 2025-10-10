@@ -213,7 +213,7 @@ export function CreditPage() {
             {account.accountType}
           </Badge>
           {account.network && (
-            <Badge color="gray" variant="light" size="sm" radius="sm">
+            <Badge variant="light" size="sm" radius="sm">
               {account.network}
             </Badge>
           )}
