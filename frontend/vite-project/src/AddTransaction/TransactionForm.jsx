@@ -81,7 +81,7 @@ const TransactionForm = ({ opened, onClose }) => {
     "Debit Card",
   ];
   const frequencies = ["Daily", "Weekly", "Monthly", "Yearly"];
-  
+
   // NEW: Options for the approval status
   const approvalStatusOptions = ["Approved", "Pending"];
 
