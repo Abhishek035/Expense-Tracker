@@ -33,9 +33,11 @@ import { ListHeader } from "../../components/ListHeader";
 import { ItemsList } from "../../components/ItemsList";
 import { SortableItem } from "../../components/SortableItem";
 import { CreditAccountForm } from "../../forms/CreditAccountForm";
+import { ItemDetails } from "../../components/ItemDetails";
 
 export function CreditPage() {
   const [accounts, setAccounts] = useState(initialCreditAccounts);
+  const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // State for the filters
@@ -51,6 +53,10 @@ export function CreditPage() {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  const handleToggleExpand = (accountId) => {
+    setExpandedAccountId(expandedAccountId === accountId ? null : accountId);
+  };
 
   // Dynamically generate filter options from the available accounts
   const { accountTypeData, networkData, providerData } = useMemo(() => {
@@ -200,61 +206,78 @@ export function CreditPage() {
     </Menu>
   );
 
-  const renderAccountItem = (account) => (
-    <SortableItem
-      key={account.id}
-      id={account.id}
-      icon={<IconCreditCard size={24} />}
-      title={account.nickname}
-      mainValue={`₹${account.amount.toLocaleString("en-IN")}`}
-      badges={
-        <>
-          <Badge variant="light" size="sm" radius="sm">
-            {account.accountType}
-          </Badge>
-          {account.network && (
+  const renderAccountItem = (account) => {
+    const isExpanded = expandedAccountId === account.id;
+
+    const handleEyeClick = (e) => {
+      e.stopPropagation(); // Prevent card's onClick from firing
+      handleToggleExpand(account.id);
+    };
+
+    return (
+      <SortableItem
+        key={account.id}
+        id={account.id}
+        isExpanded={isExpanded}
+        onToggleExpand={() => handleToggleExpand(account.id)}
+        icon={<IconCreditCard size={24} />}
+        title={account.nickname}
+        mainValue={`₹${account.amount.toLocaleString("en-IN")}`}
+        badges={
+          <>
             <Badge variant="light" size="sm" radius="sm">
-              {account.network}
+              {account.accountType}
             </Badge>
-          )}
-        </>
-      }
-      actions={
-        <>
-          <ActionIcon variant="subtle" color="gray" aria-label="View details">
-            <IconEye size={18} />
-          </ActionIcon>
-          <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon
-                variant="subtle"
-                color="gray"
-                aria-label="More options"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconEdit size={14} />}
-                onClick={() => openEditModal(account)}
-              >
-                Edit
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconTrash size={14} />}
-                onClick={() => handleDeleteAccount(account.id)}
-                color="red"
-              >
-                Delete
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </>
-      }
-    />
-  );
+            {account.network && (
+              <Badge variant="light" size="sm" radius="sm">
+                {account.network}
+              </Badge>
+            )}
+          </>
+        }
+        actions={
+          <>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              aria-label="View details"
+              onClick={handleEyeClick}
+            >
+              <IconEye size={18} />
+            </ActionIcon>
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  aria-label="More options"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <IconDotsVertical size={18} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconEdit size={14} />}
+                  onClick={() => openEditModal(account)}
+                >
+                  Edit
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconTrash size={14} />}
+                  onClick={() => handleDeleteAccount(account.id)}
+                  color="red"
+                >
+                  Delete
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </>
+        }
+        details={<ItemDetails account={account} />}
+      />
+    );
+  };
 
   return (
     <Container my="md">

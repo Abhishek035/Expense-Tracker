@@ -34,6 +34,7 @@ import { ListHeader } from "../../components/ListHeader";
 import { ItemsList } from "../../components/ItemsList";
 import { SortableItem } from "../../components/SortableItem";
 import { AccountForm } from "../../forms/AccountForm";
+import { ItemDetails } from "../../components/ItemDetails";
 
 const getAccountIcon = (type) => {
   return type === "Bank Account" ? (
@@ -51,6 +52,7 @@ const archiveStatusData = [
 
 export function AccountsPage() {
   const [accounts, setAccounts] = useState(initialAccounts);
+  const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -143,13 +145,26 @@ export function AccountsPage() {
     </Menu>
   );
 
+  const handleToggleExpand = (accountId) => {
+    setExpandedAccountId(expandedAccountId === accountId ? null : accountId);
+  };
+
   const renderAccountItem = (account) => {
     const isArchived = account.status === "archived";
+    const isExpanded = expandedAccountId === account.id;
+
+    const handleEyeClick = (e) => {
+      e.stopPropagation();
+      handleToggleExpand(account.id);
+    };
+
     return (
       <SortableItem
         key={account.id}
         id={account.id}
         isDimmed={isArchived}
+        isExpanded={isExpanded}
+        onToggleExpand={() => handleToggleExpand(account.id)}
         icon={getAccountIcon(account.type)}
         title={account.nickname}
         mainValue={`₹${account.balance.toLocaleString("en-IN")}`}
@@ -167,38 +182,44 @@ export function AccountsPage() {
         }
         actions={
           <>
-            <ActionIcon variant="subtle" color="gray" aria-label="View details">
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              aria-label="View details"
+              onClick={handleEyeClick}
+            >
               <IconEye size={18} />
             </ActionIcon>
             <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon
-                variant="subtle"
-                color="gray"
-                aria-label="More options"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <IconDotsVertical size={18} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconEdit size={14} />}
-                // onClick={() => openEditModal(account)}
-              >
-                Edit
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IconTrash size={14} />}
-                // onClick={() => handleDeleteAccount(account.id)}
-                color="red"
-              >
-                Delete
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+              <Menu.Target>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  aria-label="More options"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <IconDotsVertical size={18} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconEdit size={14} />}
+                  // onClick={() => openEditModal(account)}
+                >
+                  Edit
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconTrash size={14} />}
+                  // onClick={() => handleDeleteAccount(account.id)}
+                  color="red"
+                >
+                  Delete
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </>
         }
+        details={<ItemDetails account={account} />}
       />
     );
   };
