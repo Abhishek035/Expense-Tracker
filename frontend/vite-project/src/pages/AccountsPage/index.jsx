@@ -240,7 +240,7 @@ export function AccountsPage() {
         <ItemsList
           items={filteredAccounts}
           renderItem={renderAccountItem}
-          noItemsMessage='No accounts found. Click "Add New" to get started!'
+          noItemsMessage='No accounts found. Click "Add New" to add an account!'
         />
       </DndContext>
       <AccountForm
