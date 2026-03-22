@@ -1,0 +1,19 @@
+.sidebar {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summaryBox {
+  background-color: var(--mantine-color-white);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-3);
+  padding: 16px;
+}
+
+@media (max-width: 64em) {
+  .sidebar {
+    display: none;
+  }
+}

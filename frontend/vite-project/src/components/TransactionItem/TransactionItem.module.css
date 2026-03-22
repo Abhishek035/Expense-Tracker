@@ -1,0 +1,33 @@
+.card {
+  padding: 1rem;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background-color: var(--color-background2, #ffffff);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--mantine-color-primary-5);
+  box-shadow: 0 4px 12px rgba(0, 144, 160, 0.08);
+}
+
+.iconWrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.expense {
+  background-color: #ffeeee;
+  color: #fa5252;
+}
+
+.income {
+  background-color: #e6fcf5;
+  color: #12b886;
+}

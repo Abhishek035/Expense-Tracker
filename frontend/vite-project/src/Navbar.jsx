@@ -10,6 +10,7 @@ import {
   IconSwitchHorizontal,
   IconSquareRoundedPlusFilled,
   IconHomeDollar,
+  IconCalendar,
 } from "@tabler/icons-react";
 import { Group } from "@mantine/core";
 import classes from "./Navbar.module.css";
@@ -25,6 +26,7 @@ const data = [
   { to: "/accounts", label: "All accounts", icon: IconHomeDollar }, // <-- This is our new route
   { to: "/credit-cards", label: "Credit Cards", icon: IconCreditCardFilled },
   { to: "/statistics", label: "Statistics", icon: IconChartDonutFilled },
+  { to: "/calendar", label: "Calendar", icon: IconCalendar },
   { to: "/transactions", label: "Transactions", icon: IconCurrencyDollar },
   { to: "/settings", label: "Other Settings", icon: IconSettings },
 ];

@@ -1,0 +1,6 @@
+.layout {
+  display: flex;
+  gap: 16px;
+  height: calc(100vh - 120px); /* Adjust depending on your App shell / Nav height */
+  align-items: stretch;
+}

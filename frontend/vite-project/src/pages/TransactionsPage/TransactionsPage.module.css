@@ -1,0 +1,14 @@
+.pageWrapper {
+  padding: 1.5rem;
+  background-color: var(--color-background1, #f4f6f8); /* Matches your theme config */
+  min-height: 100vh;
+}
+
+.contentCard {
+  background-color: var(--color-background2, #ffffff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  max-width: 1000px;
+  margin: 0 auto;
+}

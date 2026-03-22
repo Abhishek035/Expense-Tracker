@@ -11,6 +11,8 @@ import Navbar from "./Navbar";
 import TransactionForm from "./AddTransaction/TransactionForm";
 import { AccountsPage } from "./pages/AccountsPage";
 import { CreditPage } from "./pages/CreditPage";
+import TransactionsPage from "./pages/TransactionsPage/TransactionsPage.jsx";
+import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import { Route, Routes } from "react-router-dom";
 
 const App = () => {
@@ -39,6 +41,8 @@ const App = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/credit-cards" element={<CreditPage />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
           </Routes>
           <TransactionForm opened={modalOpened} onClose={closeModal} />
           {/* A button or mobile menu would go here for small screens */}
