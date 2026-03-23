@@ -4,6 +4,7 @@ import CalendarHeader from '../../components/CalendarHeader/CalendarHeader';
 import CalendarSidebar from '../../components/CalendarSidebar/CalendarSidebar';
 import CalendarGrid from '../../components/CalendarGrid/CalendarGrid';
 import TransactionSidePanel from '../../components/TransactionSidePanel/TransactionSidePanel';
+import TransactionForm from '../../AddTransaction/TransactionForm';
 import { getDaysInMonthView, formatDate } from '../../utils/calendarUtils';
 import { generateMockTransactions } from '../../data/mockData';
 import classes from './CalendarPage.module.css';
@@ -17,11 +18,38 @@ export default function CalendarPage() {
   const [viewOptions, setViewOptions] = useState({ income: true, expense: true, net: true });
   
   const [filters, setFilters] = useState({ account: [], category: [], type: [] });
-  const [transactions] = useState(generateMockTransactions());
+  
+  // Update this to use setTransactions so we can modify the mock data
+  const [transactions, setTransactions] = useState(generateMockTransactions());
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleAddNewTransaction = (newTxData) => {
+    // Map the form's data structure to the calendar's data structure
+    const formattedTx = {
+      id: "t_" + Math.random().toString(36).substr(2, 9), // Generate fake ID
+      date: newTxData.date.toISOString(), // Standardize date string
+      amount: Number(newTxData.amount),
+      type: newTxData.type,
+      category: newTxData.category,
+      accountId: newTxData.paymentFrom || "acc_01", // Fallback if income
+      description: newTxData.description,
+      isRecurring: newTxData.recurring,
+      isCompleted: false // Default to false, SidePanel logic will handle it based on date
+    };
+
+    setTransactions(prev => [...prev, formattedTx]);
+  };
+
+  // Function to handle checking/unchecking a future transaction
+  const handleToggleCompletion = (id) => {
+    setTransactions(prev => prev.map(t => 
+      t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
+    ));
+  };
 
   const daysInView = useMemo(() => getDaysInMonthView(currentDate.getFullYear(), currentDate.getMonth()), [currentDate]);
 
-  // Apply ALL filters to determine what visually shows up in the day cell rows and side panel
   const fullyFilteredTransactions = useMemo(() => {
     return transactions.filter(t => {
       const accountMatch = filters.account.length === 0 || filters.account.includes(t.accountId);
@@ -31,79 +59,90 @@ export default function CalendarPage() {
     });
   }, [transactions, filters]);
 
-  // Apply ONLY ACCOUNT filters to determine the true projected balance
   const accountFilteredTransactions = useMemo(() => {
     return transactions.filter(t => {
-      // Ignore category and type filters, only filter by the selected accounts
       return filters.account.length === 0 || filters.account.includes(t.accountId);
     });
   }, [transactions, filters.account]);
 
-  // Calculate daily data
   const dailyData = useMemo(() => {
     const data = {};
     let runningBalance = INITIAL_BALANCE; 
 
+    // Get today at midnight for accurate past/future comparison
+    const todayAtMidnight = new Date();
+    todayAtMidnight.setHours(0, 0, 0, 0);
+
     daysInView.forEach(day => {
       const dateStr = formatDate(day.date);
       
-      // 1. Calculate the VISUAL Income/Expense/Net for the cell using FULLY filtered data
       const fullyFilteredForDay = fullyFilteredTransactions.filter(t => formatDate(new Date(t.date)) === dateStr);
       let cellIncome = 0; let cellExpense = 0;
+      
+      // NEW: Track counts for the cell icons
+      let completedCount = 0;
+      let pendingCount = 0;
+      let recurringCount = 0;
       
       fullyFilteredForDay.forEach(t => {
         if (t.type === 'income') cellIncome += t.amount;
         if (t.type === 'expense') cellExpense += t.amount;
+
+        // Calculate statuses
+        const txDate = new Date(t.date);
+        txDate.setHours(0, 0, 0, 0);
+        const isFuture = txDate > todayAtMidnight;
+
+        if (!isFuture || t.isCompleted) {
+          completedCount++;
+        } else if (t.isRecurring) {
+          recurringCount++;
+        } else {
+          pendingCount++;
+        }
       });
 
-      // 2. Calculate the TRUE net for the PROJECTED BALANCE using ONLY account-filtered data
       const accountFilteredForDay = accountFilteredTransactions.filter(t => formatDate(new Date(t.date)) === dateStr);
       let trueNet = 0;
-      
       accountFilteredForDay.forEach(t => {
         if (t.type === 'income') trueNet += t.amount;
         if (t.type === 'expense') trueNet -= t.amount;
       });
 
-      runningBalance += trueNet; // Updates balance accurately based on accounts alone
+      runningBalance += trueNet;
 
       data[dateStr] = { 
         income: cellIncome, 
         expense: cellExpense, 
-        net: cellIncome - cellExpense, // Visual net for the cell
-        projected: runningBalance      // True running balance
+        net: cellIncome - cellExpense,
+        projected: runningBalance,
+        completedCount, // Passed to DayCell
+        pendingCount,   // Passed to DayCell
+        recurringCount  // Passed to DayCell
       };
     });
     
     return data;
   }, [daysInView, fullyFilteredTransactions, accountFilteredTransactions]);
 
-  // Compute Summaries for the Sidebar (Based on fully filtered data so summaries match what the user sees)
+
   const summaries = useMemo(() => {
+    // ... (Keep existing summaries logic exactly the same)
     let monthlyIncome = 0, monthlyExpense = 0;
     let weeklyIncome = 0, weeklyExpense = 0;
-
     const startOfWeek = new Date(selectedDate);
     startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
-
     daysInView.forEach(day => {
       const dData = dailyData[formatDate(day.date)];
       if (!dData) return;
-
-      if (day.isCurrentMonth) {
-        monthlyIncome += dData.income;
-        monthlyExpense += dData.expense;
-      }
-
+      if (day.isCurrentMonth) { monthlyIncome += dData.income; monthlyExpense += dData.expense; }
       const dayTime = day.date.getTime();
       if (dayTime >= startOfWeek.getTime() && dayTime <= endOfWeek.getTime()) {
-        weeklyIncome += dData.income;
-        weeklyExpense += dData.expense;
+        weeklyIncome += dData.income; weeklyExpense += dData.expense;
       }
     });
-
     return { monthlyIncome, monthlyExpense, weeklyIncome, weeklyExpense };
   }, [daysInView, dailyData, selectedDate]);
 
@@ -132,8 +171,18 @@ export default function CalendarPage() {
         <TransactionSidePanel 
           selectedDate={selectedDate} 
           transactions={fullyFilteredTransactions} 
+          onToggleCompletion={handleToggleCompletion}
+          onOpenAddModal={() => setIsAddModalOpen(true)} // <-- Passed the function down
         />
       </div>
+
+      {/* ADDED: The Modal Component rendered securely at the parent level */}
+      <TransactionForm 
+        opened={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        initialDate={selectedDate} // Auto-fill the date!
+        onSubmitTransaction={handleAddNewTransaction} // Handle the save!
+      />
     </Box>
   );
 }

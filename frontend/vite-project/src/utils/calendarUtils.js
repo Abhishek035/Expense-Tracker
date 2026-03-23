@@ -20,6 +20,14 @@ export const getDaysInMonthView = (year, month) => {
   return days;
 };
 
+// FIX: Format date strictly in LOCAL time to prevent timezone shifting
+export const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const isToday = (date) => {
   const today = new Date();
   return (
@@ -28,5 +36,3 @@ export const isToday = (date) => {
     date.getFullYear() === today.getFullYear()
   );
 };
-
-export const formatDate = (date) => date.toISOString().split('T')[0];

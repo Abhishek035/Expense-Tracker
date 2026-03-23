@@ -15,20 +15,52 @@
 .transactionCard {
   border: 1px solid var(--mantine-color-gray-2);
   border-radius: 6px;
+  background-color: var(--mantine-color-white);
+  transition: all 0.2s ease;
 }
 
-.pendingCard {
+.reminderCard {
   border: 1px dashed var(--mantine-color-gray-4);
   background-color: var(--mantine-color-gray-0);
   border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.strikethrough {
+  opacity: 0.5;
 }
 
 .footer {
   border-top: 1px solid var(--mantine-color-gray-3);
 }
 
+.chevronIcon {
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Show the chevron when hovering over the card */
+.transactionCard:hover .chevronIcon,
+.reminderCard:hover .chevronIcon {
+  opacity: 1;
+}
+
+/* Ensure mobile users always see it since they can't hover */
+@media (hover: none) {
+  .chevronIcon {
+    opacity: 1;
+  }
+}
+
+.detailsBox {
+  border-top: 1px solid var(--mantine-color-gray-2);
+  background-color: var(--mantine-color-gray-0);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
 @media (max-width: 64em) {
   .sidePanel {
-    display: none; /* Can be updated to use a Mantine Drawer for mobile later */
+    display: none; 
   }
 }

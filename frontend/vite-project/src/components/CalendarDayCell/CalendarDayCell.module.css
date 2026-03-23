@@ -63,10 +63,10 @@
 /* Add these new classes to your existing DayCell CSS file */
 .dayHeader {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
+  justify-content: space-between; /* Puts icons on left, date on right */
+  align-items: flex-start;
   margin-bottom: 4px;
+  min-height: 18px;
 }
 
 .todayDot {
@@ -81,6 +81,13 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--mantine-color-gray-7);
+}
+
+.dateWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
 }
 
 /* Keep existing code, update the net rows */

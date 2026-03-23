@@ -1,20 +1,22 @@
-import { Flex, Text } from '@mantine/core';
+import { Flex, Text, Tooltip } from '@mantine/core';
+import { IconCheck, IconClock, IconRepeat } from '@tabler/icons-react';
 import { isToday } from '../../utils/calendarUtils';
 import classes from './CalendarDayCell.module.css';
 
 export default function CalendarDayCell({ dayInfo, isSelected, onSelect, data, viewOptions }) {
-  const { income = 0, expense = 0, net = 0, projected = 0 } = data || {};
+  const { 
+    income = 0, expense = 0, net = 0, projected = 0, 
+    completedCount = 0, pendingCount = 0, recurringCount = 0 
+  } = data || {};
   
   const isTodayDate = isToday(dayInfo.date);
 
-  // Determine if date is in the future (to show projected balance)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const cellDate = new Date(dayInfo.date);
   cellDate.setHours(0, 0, 0, 0);
   const isFutureDate = cellDate > today;
 
-  // Determine Net color class
   let netClass = classes.rowNetNeutral;
   if (net > 0) netClass = classes.rowNetPositive;
   if (net < 0) netClass = classes.rowNetNegative;
@@ -27,8 +29,30 @@ export default function CalendarDayCell({ dayInfo, isSelected, onSelect, data, v
       tabIndex={0}
     >
       <div className={classes.dayHeader}>
-        {isTodayDate && <span className={classes.todayDot} title="Today" />}
-        <Text className={classes.dayNumber}>{dayInfo.date.getDate()}</Text>
+        {/* LEFT SIDE: Status Icons */}
+        <Flex gap={4} align="center">
+          {completedCount > 0 && (
+            <Tooltip label={`${completedCount} Completed`} withinPortal>
+              <Flex align="center" gap={2} c="teal.6"><IconCheck size={14} stroke={3} /><Text size="xs" fw={700}>{completedCount}</Text></Flex>
+            </Tooltip>
+          )}
+          {pendingCount > 0 && (
+            <Tooltip label={`${pendingCount} Pending`} withinPortal>
+              <Flex align="center" gap={2} c="orange.5"><IconClock size={14} stroke={2.5} /><Text size="xs" fw={700}>{pendingCount}</Text></Flex>
+            </Tooltip>
+          )}
+          {recurringCount > 0 && (
+            <Tooltip label={`${recurringCount} Recurring`} withinPortal>
+              <Flex align="center" gap={2} c="blue.5"><IconRepeat size={14} stroke={2.5} /><Text size="xs" fw={700}>{recurringCount}</Text></Flex>
+            </Tooltip>
+          )}
+        </Flex>
+
+        {/* RIGHT SIDE: Today Dot & Date */}
+        <div className={classes.dateWrapper}>
+          {isTodayDate && <span className={classes.todayDot} title="Today" />}
+          <Text className={classes.dayNumber}>{dayInfo.date.getDate()}</Text>
+        </div>
       </div>
       
       <Flex direction="column" gap={2} mt="xs">
@@ -50,7 +74,6 @@ export default function CalendarDayCell({ dayInfo, isSelected, onSelect, data, v
         )}
       </Flex>
 
-      {/* Show projected balance ONLY for future dates */}
       {isFutureDate && (
         <div className={`${classes.projectedBalance} ${projected < 0 ? classes.projectedBalanceNegative : ''}`}>
           Proj: ₹{projected.toLocaleString()}

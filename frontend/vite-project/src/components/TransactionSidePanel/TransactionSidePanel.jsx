@@ -1,13 +1,123 @@
-import { Box, Flex, Text, Stack, ScrollArea, Badge, Checkbox, Button } from '@mantine/core';
-import { IconPlus } from '@tabler/icons-react';
+import React, { useState } from 'react';
+import { Box, Flex, Text, Stack, ScrollArea, Badge, Checkbox, Button, Divider, Collapse, ActionIcon } from '@mantine/core';
+import { IconPlus, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { formatDate } from '../../utils/calendarUtils';
+import { mockAccounts } from '../../data/mockData'; 
 import classes from './TransactionSidePanel.module.css';
 
-export default function TransactionSidePanel({ selectedDate, transactions }) {
+// Reusable stateful component for individual transactions
+const TransactionCard = ({ t, showCheckbox, onToggleCompletion }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isChecked = !!t.isCompleted;
+
+  // Resolve account ID to actual bank name
+  const accountLabel = mockAccounts.find(a => a.value === t.accountId)?.label || t.accountId;
+
+  return (
+    <Box className={`
+      ${showCheckbox ? classes.reminderCard : classes.transactionCard} 
+      ${showCheckbox && isChecked ? classes.strikethrough : ''}
+    `}>
+      <Flex gap="sm" align="center" p="xs">
+        {showCheckbox && (
+          <Checkbox 
+            color="primary" 
+            checked={isChecked}
+            onChange={() => onToggleCompletion(t.id)}
+            title="Mark as Paid"
+          />
+        )}
+        
+        <Box flex={1} style={{ overflow: 'hidden' }}>
+          <Flex align="center" gap="xs">
+            <Text size="sm" fw={500} truncate td={showCheckbox && isChecked ? 'line-through' : 'none'}>
+              {t.category}
+            </Text>
+            {showCheckbox && !isChecked && (
+              <Badge size="xs" color={t.isRecurring ? 'blue' : 'orange'} variant="light">
+                {t.isRecurring ? 'Recurring' : 'Pending'}
+              </Badge>
+            )}
+          </Flex>
+          <Text size="xs" c="dimmed" truncate td={showCheckbox && isChecked ? 'line-through' : 'none'}>
+            {t.description || accountLabel}
+          </Text>
+        </Box>
+        
+        <Text size="sm" fw={600} c={t.type === 'income' ? 'teal.7' : 'red.7'} td={showCheckbox && isChecked ? 'line-through' : 'none'}>
+          {t.type === 'income' ? '+' : '-'}₹{t.amount}
+        </Text>
+
+        {/* Hover Chevron */}
+        <ActionIcon 
+          variant="subtle" 
+          color="gray" 
+          size="sm"
+          className={classes.chevronIcon}
+          onClick={() => setIsExpanded((prev) => !prev)}
+        >
+          {isExpanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+        </ActionIcon>
+      </Flex>
+
+      {/* Expanded Details Section */}
+      <Collapse in={isExpanded}>
+        <Box p="xs" className={classes.detailsBox}>
+          <Flex justify="space-between" mb={4}>
+            <Text size="xs" c="dimmed">Account:</Text>
+            <Text size="xs" fw={500}>{accountLabel}</Text>
+          </Flex>
+          <Flex justify="space-between" mb={4}>
+            <Text size="xs" c="dimmed">Category:</Text>
+            <Text size="xs" fw={500}>{t.category}</Text>
+          </Flex>
+          <Flex justify="space-between" mb={4}>
+            <Text size="xs" c="dimmed">Type:</Text>
+            <Text size="xs" fw={500} tt="capitalize">{t.type}</Text>
+          </Flex>
+          {t.description && (
+            <Flex justify="space-between">
+              <Text size="xs" c="dimmed">Note:</Text>
+              <Text size="xs" fw={500} truncate maw={150} ta="right">{t.description}</Text>
+            </Flex>
+          )}
+        </Box>
+      </Collapse>
+    </Box>
+  );
+};
+
+export default function TransactionSidePanel({ selectedDate, transactions, onToggleCompletion, onOpenAddModal }) {
   const dayTransactions = transactions.filter(t => formatDate(new Date(t.date)) === formatDate(selectedDate));
   
-  const completed = dayTransactions.filter(t => !t.isPending);
-  const pending = dayTransactions.filter(t => t.isPending || t.isRecurring);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const completed = [];
+  const pending = [];
+  const recurring = [];
+
+  dayTransactions.forEach(t => {
+    const txDate = new Date(t.date);
+    txDate.setHours(0, 0, 0, 0);
+    const isFuture = txDate > today;
+
+    // RULE 1: Does it belong in the Completed section?
+    // Yes, if the date is today/past, OR if it's a future date that was checked off.
+    if (!isFuture || t.isCompleted) {
+      completed.push(t);
+    } 
+
+    // RULE 2: Does it belong in the Pending or Recurring sections?
+    // Yes, if it's a future date. (Even if it is completed, we want to keep it here so we can see it struck out).
+    if (isFuture) {
+      if (t.isRecurring) {
+        recurring.push(t);
+      } else {
+        pending.push(t);
+      }
+    }
+  });
 
   const formattedDate = selectedDate.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric' });
 
@@ -18,43 +128,41 @@ export default function TransactionSidePanel({ selectedDate, transactions }) {
       </Box>
 
       <ScrollArea style={{ flex: 1 }} p="md">
-        <Text size="sm" fw={600} c="dimmed" mb="sm">Completed</Text>
-        <Stack gap="sm" mb="xl">
-          {completed.length === 0 && <Text size="sm" c="dimmed">No completed transactions.</Text>}
-          {completed.map(t => (
-            <Flex key={t.id} justify="space-between" align="center" p="xs" className={classes.transactionCard}>
-              <Box>
-                <Text size="sm" fw={500}>{t.category}</Text>
-                <Text size="xs" c="dimmed">{t.description}</Text>
-              </Box>
-              <Text size="sm" fw={600} c={t.type === 'income' ? 'teal.7' : 'red.7'}>
-                {t.type === 'income' ? '+' : '-'}₹{t.amount}
-              </Text>
-            </Flex>
-          ))}
-        </Stack>
+        <Stack gap="xl">
+          
+          <Box>
+            <Text size="sm" fw={600} c="dimmed" mb="sm">Completed</Text>
+            <Stack gap="sm">
+              {completed.length === 0 && <Text size="sm" c="dimmed">No completed transactions.</Text>}
+              {completed.map(t => <TransactionCard key={`comp-${t.id}`} t={t} showCheckbox={false} onToggleCompletion={onToggleCompletion} />)}
+            </Stack>
+          </Box>
 
-        <Text size="sm" fw={600} c="dimmed" mb="sm">Upcoming / Pending</Text>
-        <Stack gap="sm">
-          {pending.length === 0 && <Text size="sm" c="dimmed">No pending transactions.</Text>}
-          {pending.map(t => (
-            <Flex key={t.id} gap="sm" align="center" p="xs" className={classes.pendingCard}>
-              <Checkbox color="primary" title="Mark as Paid" aria-label={`Mark ${t.category} as paid`} />
-              <Box flex={1}>
-                <Flex align="center" gap="xs">
-                  <Text size="sm" fw={500}>{t.category}</Text>
-                  <Badge size="xs" color="gray" variant="light">Upcoming</Badge>
-                </Flex>
-                <Text size="xs" c="dimmed">{t.description}</Text>
-              </Box>
-              <Text size="sm" fw={600} c={t.type === 'income' ? 'teal.7' : 'red.7'}>₹{t.amount}</Text>
-            </Flex>
-          ))}
+          <Divider />
+
+          <Box>
+            <Text size="sm" fw={600} c="dimmed" mb="sm">Pending Reminders</Text>
+            <Stack gap="sm">
+              {pending.length === 0 && <Text size="sm" c="dimmed">No pending reminders.</Text>}
+              {pending.map(t => <TransactionCard key={`pend-${t.id}`} t={t} showCheckbox={true} onToggleCompletion={onToggleCompletion} />)}
+            </Stack>
+          </Box>
+
+          <Divider />
+
+          <Box>
+            <Text size="sm" fw={600} c="dimmed" mb="sm">Recurring</Text>
+            <Stack gap="sm">
+              {recurring.length === 0 && <Text size="sm" c="dimmed">No upcoming recurring bills.</Text>}
+              {recurring.map(t => <TransactionCard key={`rec-${t.id}`} t={t} showCheckbox={true} onToggleCompletion={onToggleCompletion} />)}
+            </Stack>
+          </Box>
+          
         </Stack>
       </ScrollArea>
 
       <Box p="md" className={classes.footer}>
-        <Button fullWidth color="primary" leftSection={<IconPlus size={16} />}>
+        <Button fullWidth color="primary" leftSection={<IconPlus size={16} />} onClick={onOpenAddModal}>
           Add Transaction
         </Button>
       </Box>
