@@ -13,6 +13,7 @@ import { AccountsPage } from "./pages/AccountsPage";
 import { CreditPage } from "./pages/CreditPage";
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage.jsx";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
+import BudgetPage from "./pages/BudgetPage/BudgetPage"; // <-- IMPORT BUDGET PAGE
 import { Route, Routes } from "react-router-dom";
 
 const App = () => {
@@ -22,20 +23,10 @@ const App = () => {
   return (
     <>
       <div className="md:grid md:grid-cols-[16rem_1fr] min-h-screen font-poppins">
-        {/* 
-          Column 1: Sidebar.
-          - Has a fixed width of 280px on medium screens and up. This provides consistency.
-          - The '1fr' in the grid-cols definition for the main content means it will take up the rest of the available space.
-          - This approach is superior to col-span for a primary sidebar because the sidebar's width remains predictable and ideal for its content, while the main content area is fluid.
-        */}
-
+        {/* Column 1: Sidebar */}
         <Navbar onAddTransactionClick={openModal} />
 
-        {/* 
-          Column 2: Main Content.
-          - This will automatically take up the remaining space because of the '1fr' unit.
-          - When you zoom, the browser recalculates the available space, and this column will reflow naturally.
-        */}
+        {/* Column 2: Main Content */}
         <div className="p-6">
           <Routes>
             <Route path="/" element={<Dashboard />} />
@@ -43,9 +34,9 @@ const App = () => {
             <Route path="/credit-cards" element={<CreditPage />} />
             <Route path="/transactions" element={<TransactionsPage />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/budget" element={<BudgetPage />} /> {/* <-- ADDED ROUTE HERE */}
           </Routes>
           <TransactionForm opened={modalOpened} onClose={closeModal} />
-          {/* A button or mobile menu would go here for small screens */}
         </div>
       </div>
     </>

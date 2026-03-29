@@ -11,6 +11,7 @@ import {
   IconSquareRoundedPlusFilled,
   IconHomeDollar,
   IconCalendar,
+  IconWallet, // <-- IMPORT THE NEW ICON
 } from "@tabler/icons-react";
 import { Group } from "@mantine/core";
 import classes from "./Navbar.module.css";
@@ -23,10 +24,11 @@ const data = [
     icon: IconSquareRoundedPlusFilled,
     action: "openModal",
   },
-  { to: "/accounts", label: "All accounts", icon: IconHomeDollar }, // <-- This is our new route
+  { to: "/accounts", label: "All accounts", icon: IconHomeDollar }, 
   { to: "/credit-cards", label: "Credit Cards", icon: IconCreditCardFilled },
   { to: "/statistics", label: "Statistics", icon: IconChartDonutFilled },
   { to: "/calendar", label: "Calendar", icon: IconCalendar },
+  { to: "/budget", label: "Budget", icon: IconWallet }, // <-- ADDED BUDGET ROUTE
   { to: "/transactions", label: "Transactions", icon: IconCurrencyDollar },
   { to: "/settings", label: "Other Settings", icon: IconSettings },
 ];
@@ -60,7 +62,6 @@ export function Navbar({ onAddTransactionClick }) {
         className={({ isActive }) =>
           `${classes.link} ${isActive ? classes.active : ""}`
         }
-        // The above line combines the base class with an 'active' class if the link matches the URL
       >
         <item.icon className={classes.linkIcon} stroke={1.5} />
         <span>{item.label}</span>
