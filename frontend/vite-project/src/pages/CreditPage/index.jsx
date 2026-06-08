@@ -1,12 +1,15 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Container,
   Badge,
   ActionIcon,
   Menu,
+  Popover,
   Button,
   MultiSelect,
   Stack,
+  Loader,
+  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -28,15 +31,16 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { initialCreditAccounts, mockTransactions } from "../../data/mockData";
 import { ListHeader } from "../../components/ListHeader";
 import { ItemsList } from "../../components/ItemsList";
 import { SortableItem } from "../../components/SortableItem";
 import { CreditAccountForm } from "../../forms/CreditAccountForm";
 import { ItemDetails } from "../../components/ItemDetails";
+import { supabase } from "../../supabaseClient"; // <-- ADDED SUPABASE IMPORT
 
 export function CreditPage() {
-  const [accounts, setAccounts] = useState(initialCreditAccounts);
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- ADDED LOADING STATE
   const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -54,8 +58,136 @@ export function CreditPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // --- PHASE 3: FETCH CREDIT ACCOUNTS ---
+  useEffect(() => {
+    fetchCreditAccounts();
+  }, []);
+
+  const fetchCreditAccounts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("accounts")
+        .select("*")
+        .eq("type", "credit") // Only fetch credit accounts
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Map Supabase schema back to UI expectations
+      const formattedAccounts = data.map((dbAcc) => ({
+        id: dbAcc.id,
+        nickname: dbAcc.name,
+        amount: dbAcc.balance, // UI expects 'amount' instead of 'balance'
+        ...dbAcc.params, // Spreads accountType, network, provider, etc.
+      }));
+
+      setAccounts(formattedAccounts);
+    } catch (error) {
+      console.error("Error fetching credit accounts:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- PHASE 3: INSERT OR UPDATE ACCOUNT ---
+  const handleFormSubmit = async (formData) => {
+    try {
+      // 1. Format the data for the database
+      const payload = {
+        name: formData.nickname,
+        type: "credit",
+        balance: formData.amount || 0,
+        params: {
+          accountType: formData.accountType,
+          network: formData.network,
+          provider: formData.provider,
+          creditLimit: formData.creditLimit,
+          billingDate: formData.billingDate,
+          dueDate: formData.dueDate,
+        },
+      };
+
+      if (formData.id) {
+        // UPDATE EXISTING ACCOUNT
+        payload.edited_at = new Date().toISOString();
+        const { data, error } = await supabase
+          .from("accounts")
+          .update(payload)
+          .eq("id", formData.id)
+          .select();
+
+        if (error) throw error;
+
+        const dbAcc = data[0];
+        const updatedAccount = {
+          id: dbAcc.id,
+          nickname: dbAcc.name,
+          amount: dbAcc.balance,
+          ...dbAcc.params,
+        };
+
+        setAccounts((current) =>
+          current.map((acc) =>
+            acc.id === updatedAccount.id ? updatedAccount : acc
+          )
+        );
+      } else {
+        // INSERT NEW ACCOUNT
+        const { data, error } = await supabase
+          .from("accounts")
+          .insert([payload])
+          .select();
+
+        if (error) throw error;
+
+        const dbAcc = data[0];
+        const newAccount = {
+          id: dbAcc.id,
+          nickname: dbAcc.name,
+          amount: dbAcc.balance,
+          ...dbAcc.params,
+        };
+
+        setAccounts((current) => [newAccount, ...current]);
+      }
+
+      closeForm();
+      setSelectedAccount(null);
+    } catch (error) {
+      console.error("Error saving credit account:", error.message);
+    }
+  };
+
+  // --- PHASE 3: DELETE ACCOUNT ---
+  const handleDeleteAccount = async (accountId) => {
+    try {
+      const { error } = await supabase
+        .from("accounts")
+        .delete()
+        .eq("id", accountId);
+
+      if (error) throw error;
+
+      setAccounts((current) =>
+        current.filter((account) => account.id !== accountId)
+      );
+    } catch (error) {
+      console.error("Error deleting credit account:", error.message);
+    }
+  };
+
   const handleToggleExpand = (accountId) => {
     setExpandedAccountId(expandedAccountId === accountId ? null : accountId);
+  };
+
+  const openEditModal = (account) => {
+    setSelectedAccount(account);
+    openForm();
+  };
+
+  const openAddModal = () => {
+    setSelectedAccount(null);
+    openForm();
   };
 
   // Dynamically generate filter options from the available accounts
@@ -65,9 +197,9 @@ export function CreditPage() {
     const providers = new Set();
 
     accounts.forEach((acc) => {
-      types.add(acc.accountType);
+      if (acc.accountType) types.add(acc.accountType);
       if (acc.network) networks.add(acc.network);
-      providers.add(acc.provider);
+      if (acc.provider) providers.add(acc.provider);
     });
 
     return {
@@ -80,24 +212,20 @@ export function CreditPage() {
   const filteredAccounts = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return accounts.filter((account) => {
-      // Search filter
+      // Safe, explicit search mapping
       const matchesSearch =
         !query ||
-        Object.values(account).some((value) =>
-          String(value).toLowerCase().includes(query)
-        );
+        (account.nickname || "").toLowerCase().includes(query) ||
+        (account.accountType || "").toLowerCase().includes(query) ||
+        (account.network || "").toLowerCase().includes(query) ||
+        (account.provider || "").toLowerCase().includes(query);
 
-      // Account Type filter
       const matchesType =
         selectedAccountTypes.length === 0 ||
         selectedAccountTypes.includes(account.accountType);
-
-      // Network filter
       const matchesNetwork =
         selectedNetworks.length === 0 ||
         selectedNetworks.includes(account.network);
-
-      // Provider filter
       const matchesProvider =
         selectedProviders.length === 0 ||
         selectedProviders.includes(account.provider);
@@ -112,41 +240,6 @@ export function CreditPage() {
     selectedProviders,
   ]);
 
-  const handleFormSubmit = (formData) => {
-    if (formData.id) {
-      setAccounts((current) =>
-        current.map((account) =>
-          account.id === formData.id ? { ...account, ...formData } : account
-        )
-      );
-    } else {
-      const newAccount = {
-        ...formData,
-        id: Math.random(),
-        creationDate: new Date().toISOString().split("T")[0],
-        transactions: mockTransactions(new Date().toISOString().split("T")[0]),
-      };
-      setAccounts((current) => [newAccount, ...current]);
-    }
-    setSelectedAccount(null);
-  };
-
-  const handleDeleteAccount = (accountId) => {
-    setAccounts((current) =>
-      current.filter((account) => account.id !== accountId)
-    );
-  };
-
-  const openEditModal = (account) => {
-    setSelectedAccount(account);
-    openForm();
-  };
-
-  const openAddModal = () => {
-    setSelectedAccount(null);
-    openForm();
-  };
-
   function handleDragEnd(event) {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -158,15 +251,14 @@ export function CreditPage() {
     }
   }
 
-  // --- Completed Filter Controls UI ---
   const filterControls = (
-    <Menu
+    <Popover
       shadow="md"
       width={250}
-      closeOnItemClick={false}
       position="bottom-end"
+      withArrow
     >
-      <Menu.Target>
+      <Popover.Target>
         <Button
           variant="default"
           leftSection={<IconFilter size={16} />}
@@ -174,8 +266,9 @@ export function CreditPage() {
         >
           Filter
         </Button>
-      </Menu.Target>
-      <Menu.Dropdown>
+      </Popover.Target>
+      
+      <Popover.Dropdown>
         <Stack p="xs" gap="xs">
           <MultiSelect
             label="Account type"
@@ -184,6 +277,7 @@ export function CreditPage() {
             onChange={setSelectedAccountTypes}
             placeholder="Filter by type"
             clearable
+            comboboxProps={{ withinPortal: false }} // <-- Prevents the inner dropdown from closing the popover
           />
           <MultiSelect
             label="Card network"
@@ -192,6 +286,7 @@ export function CreditPage() {
             onChange={setSelectedNetworks}
             placeholder="Filter by network"
             clearable
+            comboboxProps={{ withinPortal: false }}
           />
           <MultiSelect
             label="Provider / Bank"
@@ -200,17 +295,18 @@ export function CreditPage() {
             onChange={setSelectedProviders}
             placeholder="Filter by provider"
             clearable
+            comboboxProps={{ withinPortal: false }}
           />
         </Stack>
-      </Menu.Dropdown>
-    </Menu>
+      </Popover.Dropdown>
+    </Popover>
   );
 
   const renderAccountItem = (account) => {
     const isExpanded = expandedAccountId === account.id;
 
     const handleEyeClick = (e) => {
-      e.stopPropagation(); // Prevent card's onClick from firing
+      e.stopPropagation();
       handleToggleExpand(account.id);
     };
 
@@ -222,14 +318,14 @@ export function CreditPage() {
         onToggleExpand={() => handleToggleExpand(account.id)}
         icon={<IconCreditCard size={24} />}
         title={account.nickname}
-        mainValue={`₹${account.amount.toLocaleString("en-IN")}`}
+        mainValue={`₹${(account.amount || 0).toLocaleString("en-IN")}`}
         badges={
           <>
-            <Badge variant="light" size="sm" radius="sm">
-              {account.accountType}
+            <Badge variant="light" size="sm" radius="sm" color="primary">
+              {account.accountType || "Credit"}
             </Badge>
             {account.network && (
-              <Badge variant="light" size="sm" radius="sm">
+              <Badge variant="light" size="sm" radius="sm" color="gray">
                 {account.network}
               </Badge>
             )}
@@ -287,17 +383,25 @@ export function CreditPage() {
         onSearchChange={(e) => setSearchQuery(e.currentTarget.value)}
         filterControls={filterControls}
       />
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <ItemsList
-          items={filteredAccounts}
-          renderItem={renderAccountItem}
-          noItemsMessage='No accounts found. Click "Add New" to get started!'
-        />
-      </DndContext>
+
+      {loading ? (
+        <Flex justify="center" mt="xl">
+          <Loader color="primary" />
+        </Flex>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <ItemsList
+            items={filteredAccounts}
+            renderItem={renderAccountItem}
+            noItemsMessage='No credit accounts found. Click "Add New" to get started!'
+          />
+        </DndContext>
+      )}
+
       <CreditAccountForm
         opened={isFormOpen}
         onClose={closeForm}

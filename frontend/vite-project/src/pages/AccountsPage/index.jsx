@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Container,
   Badge,
@@ -7,6 +7,8 @@ import {
   Button,
   MultiSelect,
   Stack,
+  Loader,
+  Flex,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -29,12 +31,12 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { initialAccounts } from "../../data/accountsData";
 import { ListHeader } from "../../components/ListHeader";
 import { ItemsList } from "../../components/ItemsList";
 import { SortableItem } from "../../components/SortableItem";
 import { AccountForm } from "../../forms/AccountForm";
 import { ItemDetails } from "../../components/ItemDetails";
+import { supabase } from "../../supabaseClient"; // <-- ADDED SUPABASE IMPORT
 
 const getAccountIcon = (type) => {
   return type === "Bank Account" ? (
@@ -51,36 +53,133 @@ const archiveStatusData = [
 ];
 
 export function AccountsPage() {
-  const [accounts, setAccounts] = useState(initialAccounts);
+  // Removed mock data, initialized as empty array
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true); // <-- ADDED LOADING STATE
   const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
-  const [selectedArchiveStatus, setSelectedArchiveStatus] = useState([
-    "active",
-  ]);
+  const [selectedArchiveStatus, setSelectedArchiveStatus] = useState(["active"]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // --- PHASE 3: FETCH ACCOUNTS FROM SUPABASE ---
+  useEffect(() => {
+    fetchAccounts();
+  }, []);
+
+  const fetchAccounts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("accounts")
+        .select("*")
+        .neq("type", "credit") 
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Map Supabase schema back to UI expectations
+      const formattedAccounts = data.map((dbAcc) => ({
+        id: dbAcc.id,
+        nickname: dbAcc.name,
+        type: dbAcc.type,
+        balance: dbAcc.balance,
+        status: dbAcc.params?.status || "active",
+        ...dbAcc.params, // Spreads extra fields like bankName or provider from JSONB
+      }));
+
+      setAccounts(formattedAccounts);
+    } catch (error) {
+      console.error("Error fetching accounts:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // --- PHASE 3: INSERT ACCOUNT INTO SUPABASE ---
+  const handleAddAccount = async (newAccountData) => {
+    try {
+      // 1. Format the data for the database
+      const accountToInsert = {
+        name: newAccountData.nickname,
+        type: newAccountData.type,
+        
+        balance: newAccountData.balance || 0, 
+        
+        params: { status: "active", bankName: newAccountData.bankName },
+      };
+
+      // 2. Insert and ask Supabase to return the new row
+      const { data, error } = await supabase
+        .from("accounts")
+        .insert([accountToInsert])
+        .select();
+
+      if (error) throw error;
+
+      const dbAcc = data[0];
+      const newAccount = {
+        id: dbAcc.id,
+        nickname: dbAcc.name,
+        type: dbAcc.type,
+        balance: dbAcc.balance,
+        status: dbAcc.params?.status || "active",
+        ...dbAcc.params,
+      };
+
+      // 3. Update the UI instantly
+      setAccounts((current) => [newAccount, ...current]);
+      close();
+    } catch (error) {
+      console.error("Error adding account:", error.message);
+    }
+  };
+
+  // --- NEW: DELETE ACCOUNT FROM SUPABASE ---
+  const handleDeleteAccount = async (accountId) => {
+    try {
+      const { error } = await supabase
+        .from("accounts")
+        .delete()
+        .eq("id", accountId);
+
+      if (error) throw error;
+
+      // Update UI by filtering out the deleted account
+      setAccounts((prev) => prev.filter((acc) => acc.id !== accountId));
+    } catch (error) {
+      console.error("Error deleting account:", error.message);
+    }
+  };
+
+  const { accountTypeData, archiveStatusData } = useMemo(() => {
+    const types = new Set();
+    const statuses = new Set();
+    accounts.forEach(acc => {
+      if (acc.type) types.add(acc.type);
+      if (acc.status) statuses.add(acc.status);
+    });
+    return { accountTypeData: [...types], archiveStatusData: [...statuses] };
+  }, [accounts]);
+
   const filteredAccounts = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return accounts.filter((account) => {
       const matchesSearch =
         !query ||
-        account.nickname.toLowerCase().includes(query) ||
-        account.type.toLowerCase().includes(query) ||
-        account.bankName?.toLowerCase().includes(query) ||
-        account.provider?.toLowerCase().includes(query);
-      const matchesType =
-        selectedAccountTypes.length === 0 ||
-        selectedAccountTypes.includes(account.type);
-      const matchesStatus =
-        selectedArchiveStatus.length === 0 ||
-        selectedArchiveStatus.includes(account.status);
+        (account.nickname || '').toLowerCase().includes(query) ||
+        (account.type || '').toLowerCase().includes(query) ||
+        (account.bankName || '').toLowerCase().includes(query) ||
+        (account.provider || '').toLowerCase().includes(query);
+        
+      const matchesType = selectedAccountTypes.length === 0 || selectedAccountTypes.includes(account.type);
+      const matchesStatus = selectedArchiveStatus.length === 0 || selectedArchiveStatus.includes(account.status);
+      
       return matchesSearch && matchesType && matchesStatus;
     });
   }, [accounts, searchQuery, selectedAccountTypes, selectedArchiveStatus]);
@@ -95,16 +194,6 @@ export function AccountsPage() {
       });
     }
   }
-
-  const handleAddAccount = (newAccountData) => {
-    const newAccount = {
-      ...newAccountData,
-      id: Math.random(),
-      balance: 0,
-      status: "active",
-    };
-    setAccounts((current) => [newAccount, ...current]);
-  };
 
   const filterControls = (
     <Menu
@@ -170,7 +259,7 @@ export function AccountsPage() {
         mainValue={`₹${account.balance.toLocaleString("en-IN")}`}
         badges={
           <>
-            <Badge variant="light" size="sm" radius="sm">
+            <Badge variant="light" size="sm" radius="sm" color="primary">
               {account.type}
             </Badge>
             {isArchived && (
@@ -204,13 +293,13 @@ export function AccountsPage() {
               <Menu.Dropdown>
                 <Menu.Item
                   leftSection={<IconEdit size={14} />}
-                  // onClick={() => openEditModal(account)}
                 >
                   Edit
                 </Menu.Item>
+                {/* UNCOMMENTED AND HOOKED UP DELETE */}
                 <Menu.Item
                   leftSection={<IconTrash size={14} />}
-                  // onClick={() => handleDeleteAccount(account.id)}
+                  onClick={() => handleDeleteAccount(account.id)}
                   color="red"
                 >
                   Delete
@@ -232,17 +321,26 @@ export function AccountsPage() {
         onSearchChange={(e) => setSearchQuery(e.currentTarget.value)}
         filterControls={filterControls}
       />
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <ItemsList
-          items={filteredAccounts}
-          renderItem={renderAccountItem}
-          noItemsMessage='No accounts found. Click "Add New" to add an account!'
-        />
-      </DndContext>
+      
+      {/* SHOW LOADING SPINNER OR DRAG CONTEXT */}
+      {loading ? (
+        <Flex justify="center" mt="xl">
+          <Loader color="primary" />
+        </Flex>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <ItemsList
+            items={filteredAccounts}
+            renderItem={renderAccountItem}
+            noItemsMessage='No accounts found. Click "Add New" to add an account!'
+          />
+        </DndContext>
+      )}
+
       <AccountForm
         opened={opened}
         onClose={close}

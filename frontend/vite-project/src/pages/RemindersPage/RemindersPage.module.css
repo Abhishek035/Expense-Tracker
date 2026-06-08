@@ -1,0 +1,124 @@
+/* src/pages/RemindersPage/RemindersPage.module.css */
+
+.pageWrapper {
+  background-color: var(--color-background1);
+  min-height: calc(100vh - 60px);
+}
+
+.floatingCard {
+  background-color: var(--mantine-color-white);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-3);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+/* Summary Widget */
+.summaryHeader {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.summaryBody {
+  display: flex;
+  padding: 24px;
+  gap: 24px;
+}
+
+.summaryCol {
+  flex: 1;
+  padding-left: 16px;
+}
+
+/* Controls */
+.controlsBar {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--mantine-color-white);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-gray-3);
+  margin-bottom: 24px;
+}
+
+/* Group Headers & List */
+.groupHeader {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  background-color: var(--mantine-color-gray-0);
+}
+
+.rowContainer {
+  display: flex;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  background-color: var(--mantine-color-white);
+  transition: background-color 0.2s;
+}
+
+.rowContainer:hover {
+  background-color: var(--mantine-color-gray-0);
+}
+
+.rowContainer:last-child {
+  border-bottom: none;
+}
+
+.rowStripe {
+  width: 4px;
+  flex-shrink: 0;
+}
+
+.stripeRed { background-color: var(--mantine-color-red-6); }
+.stripePrimary { background-color: var(--mantine-color-primary-6); }
+.stripeGray { background-color: var(--mantine-color-gray-4); }
+
+.dateBlock {
+  width: 80px;
+  border-right: 1px solid var(--mantine-color-gray-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+}
+
+.dateMonth {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--mantine-color-gray-6);
+}
+
+.dateDay {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--mantine-color-dark-9);
+  line-height: 1.1;
+}
+
+.rowGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 100px 140px;
+  align-items: center;
+  padding: 12px 24px;
+  gap: 16px;
+}
+
+/* Clean UI Elements */
+.iconCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mantine-color-primary-0);
+  color: var(--mantine-color-primary-6);
+}

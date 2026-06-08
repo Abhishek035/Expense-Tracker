@@ -1,83 +1,146 @@
+/* src/Navbar.module.css */
+
 .navbar {
-  height: 100%;
-  padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
-  background-color: var(--color-primary);
+  height: 100vh;
+  background-color: var(--mantine-color-white);
+  border-right: 1px solid var(--mantine-color-gray-2);
+  padding: 24px 0 16px 0;
+  
+  /* ADD THESE TWO LINES */
+  position: sticky;
+  top: 0;
 }
 
-@media (max-width: $mantine-breakpoint-sm) {
-  .navbar {
-    display: none;
-  }
+/* --- HEADER / LOGO --- */
+.header {
+  padding: 0 20px 24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logoIcon {
+  background-color: var(--mantine-color-primary-6);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  font-family: var(--mantine-font-family-headings);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--mantine-color-dark-9);
+}
+
+/* --- NAVIGATION LINKS --- */
 .navbarMain {
   flex: 1;
-}
-
-.header {
-  padding-bottom: var(--mantine-spacing-md);
-  margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
-  border-bottom: 1px solid var(--color-background1);
   display: flex;
-  justify-content:center;
-  align-items: center;
-  color: white;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
-.footer {
-  padding-top: var(--mantine-spacing-md);
-  margin-top: var(--mantine-spacing-md);
-  border-top: 1px solid var(--color-background1);
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 16px;
 }
 
 .link {
   display: flex;
   align-items: center;
   text-decoration: none;
-  font-size: var(--mantine-font-size-sm);
-  color: var(--mantine-color-white);
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-radius: var(--mantine-radius-sm);
+  font-size: 0.875rem;
+  /* UPDATED: A cool, grayish-teal for inactive links */
+  color: var(--mantine-color-gray-6); 
+  padding: 10px 12px;
+  border-radius: 8px;
   font-weight: 500;
-  border-radius: var(--mantine-radius-lg);
-  margin-bottom: 10px;
+  transition: background-color 0.2s, color 0.2s;
+  position: relative;
+}
 
-  @mixin hover {
-    background-color: var(--mantine-color-gray-1);
-    color: var(--color-primary);
-
-    .linkIcon {
-      color: var(--color-primary);
-    }
-  }
-
-  &[data-active] {
-    &,
-    &:hover {
-      background-color: var(--mantine-color-white);
-      color: var(--color-primary);
-
-      .linkIcon {
-        color: var(--mantine-color-primary)
-      }
-    }
-  }
-
-  &.active {
-    background-color: var(--mantine-color-white);
-      color: var(--color-primary);
-
-      .linkIcon {
-        color: var(--mantine-color-primary)
-      }
-  }
+.link:hover {
+  background-color: var(--mantine-color-gray-0);
+  color: var(--mantine-color-gray-8);
 }
 
 .linkIcon {
-  color: var(--mantine-color-primary-1);
-  margin-right: var(--mantine-spacing-sm);
-  width: 25px;
-  height: 25px;
+  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+  color: inherit; 
+}
+
+/* Active State Styles */
+.active {
+  /* Very soft teal background */
+  background-color: var(--mantine-color-primary-0) !important;
+  /* UPDATED: Bold Teal for the text AND the icon */
+  color: var(--mantine-color-primary-7) !important; 
+  font-weight: 600;
+}
+
+/* The thick vertical line on the active link */
+.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -16px; 
+  bottom: 0;
+  width: 4px;
+  background-color: var(--mantine-color-primary-6);
+  border-radius: 0 4px 4px 0;
+}
+
+/* --- FOOTER / BOTTOM WIDGETS --- */
+.footer {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.upgradeCard {
+  background-color: var(--mantine-color-gray-0);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.upgradeIcon {
+  color: var(--mantine-color-primary-6);
+  margin-bottom: 8px;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+
+.userProfile:hover {
+  background-color: var(--mantine-color-gray-1);
 }

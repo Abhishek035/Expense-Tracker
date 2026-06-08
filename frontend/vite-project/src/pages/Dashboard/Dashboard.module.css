@@ -1,0 +1,93 @@
+.pageWrapper {
+  min-height: calc(100vh - 60px);
+}
+
+.header {
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  background-color: var(--mantine-color-white);
+  border: 1px solid var(--mantine-color-gray-3);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cardHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTitleArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.viewAllLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mantine-color-primary-6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.viewAllLink:hover {
+  text-decoration: underline;
+}
+
+.cardBody {
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Quick Wallet Specific */
+.walletContainer {
+  display: flex;
+  padding: 32px 0;
+  align-items: center;
+}
+
+.walletDivider {
+  width: 1px;
+  background-color: var(--mantine-color-gray-2);
+  height: 60px;
+  margin: 0 32px;
+}
+
+/* List Rows */
+.listRow {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--mantine-color-gray-1);
+}
+
+.listRow:last-child {
+  border-bottom: none;
+}
+
+.listIconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

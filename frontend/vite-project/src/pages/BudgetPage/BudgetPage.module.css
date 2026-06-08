@@ -83,18 +83,19 @@
 }
 
 /* Strict grid to force perfect alignment */
+/* Update these two classes in src/pages/BudgetPage/BudgetPage.module.css */
+
 .rowGrid {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr 140px; 
+  grid-template-columns: 3fr 1fr 1fr 1fr 170px; /* Changed 140px to 170px */
   align-items: center;
   padding: 16px 24px;
   gap: 16px;
 }
 
-/* Separate header class using the exact same grid ratio */
 .headerRow {
   display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr 140px;
+  grid-template-columns: 3fr 1fr 1fr 1fr 170px; /* Changed 140px to 170px */
   align-items: center;
   padding: 12px 24px;
   gap: 16px;
