@@ -43,6 +43,7 @@ export function CreditPage() {
   const [loading, setLoading] = useState(true); // <-- ADDED LOADING STATE
   const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // State for the filters
   const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
@@ -253,22 +254,26 @@ export function CreditPage() {
 
   const filterControls = (
     <Popover
+      opened={isFilterOpen}      
+      onChange={setIsFilterOpen}  
       shadow="md"
       width={250}
       position="bottom-end"
       withArrow
+      trapFocus={false}      
     >
       <Popover.Target>
         <Button
           variant="default"
           leftSection={<IconFilter size={16} />}
           rightSection={<IconChevronDown size={16} />}
+          onClick={() => setIsFilterOpen((o) => !o)}
         >
           Filter
         </Button>
       </Popover.Target>
       
-      <Popover.Dropdown>
+      <Popover.Dropdown onClick={(e) => e.stopPropagation()}>
         <Stack p="xs" gap="xs">
           <MultiSelect
             label="Account type"
@@ -277,7 +282,7 @@ export function CreditPage() {
             onChange={setSelectedAccountTypes}
             placeholder="Filter by type"
             clearable
-            comboboxProps={{ withinPortal: false }} // <-- Prevents the inner dropdown from closing the popover
+            comboboxProps={{ withinPortal: false }}
           />
           <MultiSelect
             label="Card network"

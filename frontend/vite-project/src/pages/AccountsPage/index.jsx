@@ -4,6 +4,7 @@ import {
   Badge,
   ActionIcon,
   Menu,
+  Popover,
   Button,
   MultiSelect,
   Stack,
@@ -58,6 +59,7 @@ export function AccountsPage() {
   const [loading, setLoading] = useState(true); // <-- ADDED LOADING STATE
   const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [opened, { open, close }] = useDisclosure(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAccountTypes, setSelectedAccountTypes] = useState([]);
@@ -170,16 +172,25 @@ export function AccountsPage() {
   const filteredAccounts = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
     return accounts.filter((account) => {
+      // 1. Text Search
       const matchesSearch =
         !query ||
-        (account.nickname || '').toLowerCase().includes(query) ||
-        (account.type || '').toLowerCase().includes(query) ||
-        (account.bankName || '').toLowerCase().includes(query) ||
-        (account.provider || '').toLowerCase().includes(query);
-        
-      const matchesType = selectedAccountTypes.length === 0 || selectedAccountTypes.includes(account.type);
-      const matchesStatus = selectedArchiveStatus.length === 0 || selectedArchiveStatus.includes(account.status);
-      
+        (account.nickname || "").toLowerCase().includes(query) ||
+        (account.type || "").toLowerCase().includes(query) ||
+        (account.bankName || "").toLowerCase().includes(query) ||
+        (account.provider || "").toLowerCase().includes(query);
+
+      // 2. Type Match
+      const matchesType =
+        selectedAccountTypes.length === 0 ||
+        selectedAccountTypes.includes(account.type);
+
+      // 3. Status Match (Fallback to 'active' if undefined)
+      const currentStatus = account.status || "active";
+      const matchesStatus =
+        selectedArchiveStatus.length === 0 ||
+        selectedArchiveStatus.includes(currentStatus);
+
       return matchesSearch && matchesType && matchesStatus;
     });
   }, [accounts, searchQuery, selectedAccountTypes, selectedArchiveStatus]);
@@ -196,22 +207,27 @@ export function AccountsPage() {
   }
 
   const filterControls = (
-    <Menu
+    <Popover
+      opened={isFilterOpen}
+      onChange={setIsFilterOpen}
       shadow="md"
       width={250}
-      closeOnItemClick={false}
       position="bottom-end"
+      withArrow
+      trapFocus={false}
     >
-      <Menu.Target>
+      <Popover.Target>
         <Button
           variant="default"
           leftSection={<IconFilter size={16} />}
           rightSection={<IconChevronDown size={16} />}
+          onClick={() => setIsFilterOpen((o) => !o)}
         >
           Filter
         </Button>
-      </Menu.Target>
-      <Menu.Dropdown>
+      </Popover.Target>
+      
+      <Popover.Dropdown onClick={(e) => e.stopPropagation()}>
         <Stack p="xs" gap="xs">
           <MultiSelect
             label="Account type"
@@ -220,6 +236,7 @@ export function AccountsPage() {
             onChange={setSelectedAccountTypes}
             placeholder="Filter by type"
             clearable
+            comboboxProps={{ withinPortal: false }}
           />
           <MultiSelect
             label="Archive status"
@@ -228,10 +245,11 @@ export function AccountsPage() {
             onChange={setSelectedArchiveStatus}
             placeholder="Filter by status"
             clearable
+            comboboxProps={{ withinPortal: false }}
           />
         </Stack>
-      </Menu.Dropdown>
-    </Menu>
+      </Popover.Dropdown>
+    </Popover>
   );
 
   const handleToggleExpand = (accountId) => {
