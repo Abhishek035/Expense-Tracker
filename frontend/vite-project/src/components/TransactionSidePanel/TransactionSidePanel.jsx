@@ -2,16 +2,16 @@ import React, { useState } from 'react';
 import { Box, Flex, Text, Stack, ScrollArea, Badge, Checkbox, Button, Divider, Collapse, ActionIcon } from '@mantine/core';
 import { IconPlus, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { formatDate } from '../../utils/calendarUtils';
-import { mockAccounts } from '../../data/mockData'; 
 import classes from './TransactionSidePanel.module.css';
+// REMOVE the mockAccounts import!
 
-// Reusable stateful component for individual transactions
-const TransactionCard = ({ t, showCheckbox, onToggleCompletion }) => {
+// 1. Pass accountsList into the Card
+const TransactionCard = ({ t, showCheckbox, onToggleCompletion, accountsList }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isChecked = !!t.isCompleted;
 
-  // Resolve account ID to actual bank name
-  const accountLabel = mockAccounts.find(a => a.value === t.accountId)?.label || t.accountId;
+  // 2. Use the live accountsList to find the real bank name!
+  const accountLabel = accountsList?.find(a => a.value === (t.accountId || t.account_id))?.label || 'Unknown Account';
 
   return (
     <Box className={`
@@ -39,33 +39,26 @@ const TransactionCard = ({ t, showCheckbox, onToggleCompletion }) => {
               </Badge>
             )}
           </Flex>
+          {/* Shows the actual Bank Name now instead of UUID */}
           <Text size="xs" c="dimmed" truncate td={showCheckbox && isChecked ? 'line-through' : 'none'}>
             {t.description || accountLabel}
           </Text>
         </Box>
         
         <Text size="sm" fw={600} c={t.type === 'income' ? 'teal.7' : 'red.7'} td={showCheckbox && isChecked ? 'line-through' : 'none'}>
-          {t.type === 'income' ? '+' : '-'}₹{t.amount}
+          {t.type === 'income' ? '+' : '-'}₹{Number(t.amount).toLocaleString('en-IN')}
         </Text>
 
-        {/* Hover Chevron */}
-        <ActionIcon 
-          variant="subtle" 
-          color="gray" 
-          size="sm"
-          className={classes.chevronIcon}
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
+        <ActionIcon variant="subtle" color="gray" size="sm" className={classes.chevronIcon} onClick={() => setIsExpanded((prev) => !prev)}>
           {isExpanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
         </ActionIcon>
       </Flex>
 
-      {/* Expanded Details Section */}
       <Collapse in={isExpanded}>
         <Box p="xs" className={classes.detailsBox}>
           <Flex justify="space-between" mb={4}>
             <Text size="xs" c="dimmed">Account:</Text>
-            <Text size="xs" fw={500}>{accountLabel}</Text>
+            <Text size="xs" fw={500}>{accountLabel}</Text> 
           </Flex>
           <Flex justify="space-between" mb={4}>
             <Text size="xs" c="dimmed">Category:</Text>
@@ -87,7 +80,7 @@ const TransactionCard = ({ t, showCheckbox, onToggleCompletion }) => {
   );
 };
 
-export default function TransactionSidePanel({ selectedDate, transactions, onToggleCompletion, onOpenAddModal }) {
+export default function TransactionSidePanel({ selectedDate, transactions, onToggleCompletion, onOpenAddModal, accountsList  }) {
   const dayTransactions = transactions.filter(t => formatDate(new Date(t.date)) === formatDate(selectedDate));
   
   const today = new Date();
@@ -134,7 +127,7 @@ export default function TransactionSidePanel({ selectedDate, transactions, onTog
             <Text size="sm" fw={600} c="dimmed" mb="sm">Completed</Text>
             <Stack gap="sm">
               {completed.length === 0 && <Text size="sm" c="dimmed">No completed transactions.</Text>}
-              {completed.map(t => <TransactionCard key={`comp-${t.id}`} t={t} showCheckbox={false} onToggleCompletion={onToggleCompletion} />)}
+              {completed.map(t => <TransactionCard key={`comp-${t.id}`} t={t} showCheckbox={false} onToggleCompletion={onToggleCompletion} accountsList={accountsList}/>)}
             </Stack>
           </Box>
 

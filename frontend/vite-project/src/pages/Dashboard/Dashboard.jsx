@@ -97,9 +97,16 @@ export default function Dashboard() {
   if (loading) return <Flex justify="center" mt="10vh"><Loader color="primary" /></Flex>;
 
   return (
-    <Box p="lg" className={classes.pageWrapper}>
+    <Box p={{ base: 'md', sm: 'lg' }} className={classes.pageWrapper}>
       
-      <div className={classes.header}>
+      {/* 1. RESPONSIVE HEADER */}
+      <Flex 
+        direction={{ base: 'column', sm: 'row' }} 
+        justify="space-between" 
+        align={{ base: 'stretch', sm: 'center' }} 
+        gap="md"
+        mb={32}
+      >
         <Box>
           <Title order={2} fw={700} c="dark.9">Good Morning <span role="img" aria-label="wave">👋</span></Title>
           <Text c="dimmed" size="sm" mt={4}>Here is your snapshot for today.</Text>
@@ -107,27 +114,35 @@ export default function Dashboard() {
         <Button color="primary" radius="md" size="md" leftSection={<IconSparkles size={16} />} style={{ boxShadow: '0 4px 14px rgba(0, 144, 160, 0.2)' }}>
           Ask AI Advisor
         </Button>
-      </div>
+      </Flex>
 
-      <Grid gutter="xl">
+      <Grid gutter={{ base: 'md', sm: 'xl' }}>
         
         {/* QUICK WALLET */}
         <Grid.Col span={{ base: 12, lg: 6 }}>
           <DashboardCard icon={IconWallet} title="Quick Wallet">
-            <div className={classes.walletContainer}>
-              <Box flex={1} ta="center">
+            {/* Stack vertically on phone, row on desktop */}
+            <Flex direction={{ base: 'column', sm: 'row' }} align="center" py="xl" gap="md">
+              <Box flex={1} ta="center" w="100%">
                 <Text size="sm" c="dimmed" fw={500} mb={8}>Total Available Cash</Text>
-                <Text size="2.5rem" fw={700} c="primary.6" lh={1}>₹{stats.cash.toLocaleString('en-IN')}</Text>
+                {/* Responsive font size: 2rem on phone, 2.5rem on desktop */}
+                <Text fz={{ base: '2rem', sm: '2.5rem' }} fw={700} c="primary.6" lh={1}>₹{stats.cash.toLocaleString('en-IN')}</Text>
               </Box>
-              <div className={classes.walletDivider} />
-              <Box flex={1} ta="center">
+              
+              {/* Divider: Horizontal on phone, Vertical on desktop */}
+              <Box hiddenFrom="sm" h={1} w="100%" bg="gray.2" my="sm" />
+              <Box visibleFrom="sm" w={1} h={60} bg="gray.2" mx="xl" />
+
+              <Box flex={1} ta="center" w="100%">
                 <Text size="sm" c="dimmed" fw={500} mb={8}>Credit Card Debt</Text>
-                <Text size="2.5rem" fw={700} c="red.6" lh={1}>₹{stats.credit.toLocaleString('en-IN')}</Text>
+                <Text fz={{ base: '2rem', sm: '2.5rem' }} fw={700} c="red.6" lh={1}>₹{stats.credit.toLocaleString('en-IN')}</Text>
               </Box>
-            </div>
+            </Flex>
           </DashboardCard>
         </Grid.Col>
 
+        {/* ... The rest of your Dashboard grid columns (Alerts, Upcoming, Recent) stay exactly the same ... */}
+        
         {/* ALERTS (Kept static for now) */}
         <Grid.Col span={{ base: 12, lg: 6 }}>
           <DashboardCard icon={IconBell} title="Smart Alerts & Notifications">
@@ -139,7 +154,7 @@ export default function Dashboard() {
                 <Box flex={1} ml="md">
                   <Text size="sm" fw={500} c="dark.9">{alert.message}</Text>
                 </Box>
-                <Text size="xs" c="dimmed">{alert.time}</Text>
+                <Text size="xs" c="dimmed" display={{ base: 'none', sm: 'block' }}>{alert.time}</Text>
               </div>
             ))}
           </DashboardCard>
@@ -153,11 +168,11 @@ export default function Dashboard() {
             ) : upcomingBills.map(bill => (
               <div key={bill.id} className={classes.listRow}>
                 <Avatar color="primary" radius="xl" size="md">{bill.description?.charAt(0) || bill.category?.charAt(0) || 'B'}</Avatar>
-                <Box flex={1} ml="md">
-                  <Text size="sm" fw={600} c="dark.9">{bill.description || bill.category}</Text>
+                <Box flex={1} ml="md" style={{ overflow: 'hidden' }}>
+                  <Text size="sm" fw={600} c="dark.9" truncate>{bill.description || bill.category}</Text>
                   <Text size="xs" c="dimmed" mt={2}>{formatDate(bill.date)}</Text>
                 </Box>
-                <Text size="sm" fw={600} c="dark.9">₹{Number(bill.amount).toLocaleString('en-IN')}</Text>
+                <Text size="sm" fw={600} c="dark.9" ml="sm">₹{Number(bill.amount).toLocaleString('en-IN')}</Text>
               </div>
             ))}
           </DashboardCard>
@@ -173,11 +188,11 @@ export default function Dashboard() {
                 <div className={classes.listIconWrapper} style={{ backgroundColor: 'var(--mantine-color-gray-1)', color: 'var(--mantine-color-dark-4)' }}>
                   {getCategoryIcon(activity.category)}
                 </div>
-                <Box flex={1} ml="md">
-                  <Text size="sm" fw={600} c="dark.9" truncate maw={180}>{activity.description || activity.category}</Text>
-                  <Text size="xs" c="dimmed" mt={2}>{formatDate(activity.date)} • {activity.category}</Text>
+                <Box flex={1} ml="md" style={{ overflow: 'hidden' }}>
+                  <Text size="sm" fw={600} c="dark.9" truncate>{activity.description || activity.category}</Text>
+                  <Text size="xs" c="dimmed" mt={2}>{formatDate(activity.date)} <span style={{ display: 'inline-block' }}>• {activity.category}</span></Text>
                 </Box>
-                <Text size="sm" fw={700} c={activity.type === 'income' ? 'teal.6' : 'dark.9'}>
+                <Text size="sm" fw={700} c={activity.type === 'income' ? 'teal.6' : 'dark.9'} ml="sm">
                   {activity.type === 'income' ? '+' : '-'}₹{Number(activity.amount).toLocaleString('en-IN')}
                 </Text>
               </div>

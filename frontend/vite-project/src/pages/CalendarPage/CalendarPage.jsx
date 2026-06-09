@@ -1,15 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { Box } from '@mantine/core';
+// src/pages/CalendarPage/CalendarPage.jsx
+import React, { useState, useMemo, useEffect } from 'react';
+import { Box, Loader, Flex } from '@mantine/core';
 import CalendarHeader from '../../components/CalendarHeader/CalendarHeader';
 import CalendarSidebar from '../../components/CalendarSidebar/CalendarSidebar';
 import CalendarGrid from '../../components/CalendarGrid/CalendarGrid';
 import TransactionSidePanel from '../../components/TransactionSidePanel/TransactionSidePanel';
 import TransactionForm from '../../AddTransaction/TransactionForm';
 import { getDaysInMonthView, formatDate } from '../../utils/calendarUtils';
-import { generateMockTransactions } from '../../data/mockData';
+import { supabase } from '../../supabaseClient'; // <-- IMPORT SUPABASE
 import classes from './CalendarPage.module.css';
-
-const INITIAL_BALANCE = 12000;
 
 export default function CalendarPage() {
   const today = new Date();
@@ -19,35 +18,93 @@ export default function CalendarPage() {
   
   const [filters, setFilters] = useState({ account: [], category: [], type: [] });
   
-  // Update this to use setTransactions so we can modify the mock data
-  const [transactions, setTransactions] = useState(generateMockTransactions());
+  // LIVE DATABASE STATE
+  const [transactions, setTransactions] = useState([]);
+  const [accountsList, setAccountsList] = useState([]); // Used to dynamically populate filters
+  const [initialBalance, setInitialBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const handleAddNewTransaction = (newTxData) => {
-    // Map the form's data structure to the calendar's data structure
-    const formattedTx = {
-      id: "t_" + Math.random().toString(36).substr(2, 9), // Generate fake ID
-      date: newTxData.date.toISOString(), // Standardize date string
-      amount: Number(newTxData.amount),
-      type: newTxData.type,
-      category: newTxData.category,
-      accountId: newTxData.paymentFrom || "acc_01", // Fallback if income
-      description: newTxData.description,
-      isRecurring: newTxData.recurring,
-      isCompleted: false // Default to false, SidePanel logic will handle it based on date
-    };
+  // --- 1. FETCH DATA FROM SUPABASE ---
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // A. Fetch Accounts (For starting balance and filters)
+      const { data: accData, error: accError } = await supabase.from('accounts').select('*');
+      if (accError) throw accError;
 
-    setTransactions(prev => [...prev, formattedTx]);
+      let baseBal = 0;
+      const formattedAccs = [];
+      if (accData) {
+        accData.forEach(acc => {
+          // Add to starting balance only if it's cash/debit
+          if (acc.type !== 'credit') baseBal += Number(acc.balance || 0);
+          formattedAccs.push({ value: acc.id, label: acc.name });
+        });
+      }
+      setInitialBalance(baseBal);
+      setAccountsList(formattedAccs);
+
+      // B. Fetch Transactions
+      const { data: txData, error: txError } = await supabase.from('transactions').select('*');
+      if (txError) throw txError;
+
+      // Map DB schema to UI expectations
+      const formattedTx = txData.map(t => ({
+        ...t,
+        accountId: t.account_id,
+        isCompleted: t.is_completed,
+        isRecurring: t.params?.is_recurring || false,
+      }));
+
+      setTransactions(formattedTx);
+    } catch (error) {
+      console.error("Error fetching calendar data:", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Function to handle checking/unchecking a future transaction
-  const handleToggleCompletion = (id) => {
+  useEffect(() => {
+    fetchData();
+
+    // Listen for the global event fired by TransactionForm to refresh the calendar
+    window.addEventListener('transaction-updated', fetchData);
+    return () => window.removeEventListener('transaction-updated', fetchData);
+  }, []);
+
+
+  // --- 2. TOGGLE COMPLETION (SUPABASE UPDATE) ---
+  const handleToggleCompletion = async (id) => {
+    const tx = transactions.find(t => t.id === id);
+    if (!tx) return;
+
+    // Optimistic UI Update (Makes it feel instantly responsive)
     setTransactions(prev => prev.map(t => 
       t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
     ));
+
+    try {
+      // Push the flip to Supabase. 
+      // NOTE: Because of our Postgres Triggers, flipping this to TRUE 
+      // will automatically deduct the amount from the account balance!
+      const { error } = await supabase
+        .from('transactions')
+        .update({ is_completed: !tx.isCompleted })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // Fire global event so Dashboard/Accounts pages know the balance changed
+      window.dispatchEvent(new Event('transaction-updated'));
+    } catch (err) {
+      console.error("Error updating completion status:", err.message);
+      fetchData(); // Revert on error
+    }
   };
 
+  // --- CORE MATH LOGIC (Remains the exact same) ---
   const daysInView = useMemo(() => getDaysInMonthView(currentDate.getFullYear(), currentDate.getMonth()), [currentDate]);
 
   const fullyFilteredTransactions = useMemo(() => {
@@ -67,19 +124,16 @@ export default function CalendarPage() {
 
   const dailyData = useMemo(() => {
     const data = {};
-    let runningBalance = INITIAL_BALANCE; 
+    let runningBalance = initialBalance; // <-- Now uses dynamic total cash balance
 
-    // Get today at midnight for accurate past/future comparison
     const todayAtMidnight = new Date();
     todayAtMidnight.setHours(0, 0, 0, 0);
 
     daysInView.forEach(day => {
       const dateStr = formatDate(day.date);
-      
       const fullyFilteredForDay = fullyFilteredTransactions.filter(t => formatDate(new Date(t.date)) === dateStr);
       let cellIncome = 0; let cellExpense = 0;
       
-      // NEW: Track counts for the cell icons
       let completedCount = 0;
       let pendingCount = 0;
       let recurringCount = 0;
@@ -88,18 +142,13 @@ export default function CalendarPage() {
         if (t.type === 'income') cellIncome += t.amount;
         if (t.type === 'expense') cellExpense += t.amount;
 
-        // Calculate statuses
         const txDate = new Date(t.date);
         txDate.setHours(0, 0, 0, 0);
         const isFuture = txDate > todayAtMidnight;
 
-        if (!isFuture || t.isCompleted) {
-          completedCount++;
-        } else if (t.isRecurring) {
-          recurringCount++;
-        } else {
-          pendingCount++;
-        }
+        if (!isFuture || t.isCompleted) completedCount++;
+        else if (t.isRecurring) recurringCount++;
+        else pendingCount++;
       });
 
       const accountFilteredForDay = accountFilteredTransactions.filter(t => formatDate(new Date(t.date)) === dateStr);
@@ -116,24 +165,23 @@ export default function CalendarPage() {
         expense: cellExpense, 
         net: cellIncome - cellExpense,
         projected: runningBalance,
-        completedCount, // Passed to DayCell
-        pendingCount,   // Passed to DayCell
-        recurringCount  // Passed to DayCell
+        completedCount,
+        pendingCount,   
+        recurringCount  
       };
     });
     
     return data;
-  }, [daysInView, fullyFilteredTransactions, accountFilteredTransactions]);
-
+  }, [daysInView, fullyFilteredTransactions, accountFilteredTransactions, initialBalance]);
 
   const summaries = useMemo(() => {
-    // ... (Keep existing summaries logic exactly the same)
     let monthlyIncome = 0, monthlyExpense = 0;
     let weeklyIncome = 0, weeklyExpense = 0;
     const startOfWeek = new Date(selectedDate);
     startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
+    
     daysInView.forEach(day => {
       const dData = dailyData[formatDate(day.date)];
       if (!dData) return;
@@ -146,6 +194,10 @@ export default function CalendarPage() {
     return { monthlyIncome, monthlyExpense, weeklyIncome, weeklyExpense };
   }, [daysInView, dailyData, selectedDate]);
 
+  if (loading && transactions.length === 0) {
+    return <Flex justify="center" mt="20vh"><Loader color="primary" /></Flex>;
+  }
+
   return (
     <Box p="md" style={{ backgroundColor: 'var(--color-background1)' }}>
       <CalendarHeader 
@@ -155,6 +207,7 @@ export default function CalendarPage() {
         setViewOptions={setViewOptions}
         filters={filters}
         setFilters={setFilters}
+        accountsList={accountsList} // Pass the dynamic accounts down for the filter dropdown
       />
 
       <div className={classes.layout}>
@@ -172,16 +225,15 @@ export default function CalendarPage() {
           selectedDate={selectedDate} 
           transactions={fullyFilteredTransactions} 
           onToggleCompletion={handleToggleCompletion}
-          onOpenAddModal={() => setIsAddModalOpen(true)} // <-- Passed the function down
+          onOpenAddModal={() => setIsAddModalOpen(true)}
+          accountsList={accountsList}
         />
       </div>
 
-      {/* ADDED: The Modal Component rendered securely at the parent level */}
       <TransactionForm 
         opened={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
-        initialDate={selectedDate} // Auto-fill the date!
-        onSubmitTransaction={handleAddNewTransaction} // Handle the save!
+        initialDate={selectedDate}
       />
     </Box>
   );

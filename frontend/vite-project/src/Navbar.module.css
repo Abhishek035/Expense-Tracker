@@ -3,14 +3,10 @@
 .navbar {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%; 
   background-color: var(--mantine-color-white);
-  border-right: 1px solid var(--mantine-color-gray-2);
+  box-sizing: border-box;
   padding: 24px 0 16px 0;
-  
-  /* ADD THESE TWO LINES */
-  position: sticky;
-  top: 0;
 }
 
 /* --- HEADER / LOGO --- */

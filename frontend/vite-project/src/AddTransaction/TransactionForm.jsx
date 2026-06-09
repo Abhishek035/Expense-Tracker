@@ -97,7 +97,7 @@ const TransactionForm = ({ opened, onClose, initialDate, onSubmitTransaction }) 
               <NumberInput label="Amount" placeholder="0.00" required min={0.01} step={0.01} decimalScale={2} fixedDecimalScale hideControls prefix="₹" {...form.getInputProps("amount")} />
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6 }}>
-              <DateTimePicker label="Date & Time" required clearable={false} maxDate={new Date()} leftSection={<IconCalendar size={16} />} {...form.getInputProps("date")} />
+              <DateTimePicker label="Date & Time" required clearable={false} leftSection={<IconCalendar size={16} />} {...form.getInputProps("date")} />
             </Grid.Col>
           </Grid>
 

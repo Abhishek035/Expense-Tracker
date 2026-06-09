@@ -6,7 +6,7 @@ import classes from './CalendarHeader.module.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-export default function CalendarHeader({ currentDate, setCurrentDate, viewOptions, setViewOptions, filters, setFilters }) {
+export default function CalendarHeader({ currentDate, setCurrentDate, viewOptions, setViewOptions, filters, setFilters, accountsList }) {
   const [dateDropdownOpened, setDateDropdownOpened] = useState(false);
 
   // Filter Dropdown State
@@ -131,7 +131,7 @@ export default function CalendarHeader({ currentDate, setCurrentDate, viewOption
               <MultiSelect 
                 label="Accounts" 
                 placeholder="Select accounts" 
-                data={mockAccounts} 
+                data={accountsList || []}
                 value={draftFilters.account} 
                 onChange={(val) => setDraftFilters(p => ({ ...p, account: val }))} 
                 clearable 
