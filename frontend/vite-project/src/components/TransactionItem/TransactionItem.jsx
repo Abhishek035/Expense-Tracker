@@ -46,9 +46,9 @@ export default function TransactionItem({ transaction, accounts, onEdit }) {
       {/* Description Column */}
       <Table.Td>
         <Text fz="sm" fw={600} c="dark.8">{transaction.description}</Text>
-        <Text fz="xs" c="dimmed">
+        {/* <Text fz="xs" c="dimmed">
           {dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} {dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-        </Text>
+        </Text> */}
       </Table.Td>
 
       {/* Type Column */}

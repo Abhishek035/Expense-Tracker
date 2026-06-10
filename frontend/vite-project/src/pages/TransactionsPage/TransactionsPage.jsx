@@ -206,17 +206,19 @@ export default function TransactionsPage() {
                   </Table.Tr>
                 ) : filteredTransactions.length > 0 ? (
                   filteredTransactions.map((t) => {
+                    // 1. Manually find the exact String name of the account from the accountsList
                     const accountLabel =
                       accountsList.find((a) => a.value === t.account_id)
                         ?.label || "Unknown";
-                    const isRecurring = t.params?.is_recurring || false;
+
                     return (
                       <TransactionItem
                         key={t.id}
                         transaction={{
                           ...t,
-                          accountId: accountLabel,
-                          isRecurring: isRecurring, // <-- Pass this explicitly!
+                          accountId: t.account_id, // Pass UUID for Edit modal to work
+                          account: accountLabel, // Pass explicitly as 'account' string
+                          accountName: accountLabel, // Pass explicitly as 'accountName' string
                         }}
                         accounts={accountsList}
                         onEdit={() => setEditingTransaction(t)}
